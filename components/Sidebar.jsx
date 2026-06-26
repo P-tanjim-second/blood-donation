@@ -39,6 +39,7 @@ const getNavItems = (role) => {
     { label: "All Requests", href: "/dashboard/all-blood-donation-request", icon: "requests" },
   ];
   const volunteerItems = [
+    { label: "New Request", href: "/dashboard/create-donation-request", icon: "add" },
     { label: "All Requests", href: "/dashboard/all-blood-donation-request", icon: "requests" },
   ];
 

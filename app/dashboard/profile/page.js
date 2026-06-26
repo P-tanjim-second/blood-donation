@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { Button, Avatar } from "@heroui/react";
 import { usersAPI } from "@/lib/api";
 import { mockCurrentUser, BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
-import { getUser } from "@/lib/api/user/user";
+import { getUser, userUpdate } from "@/lib/api/user/user";
 import { CustomSelect } from "@/components/CustomSelect";
+import toast from "react-hot-toast";
 
 // 1. ✅ FIXED: Moved Field component outside to prevent input elements from remounting on keystroke
 const Field = ({ label, children }) => (
@@ -43,10 +44,24 @@ export default function ProfilePage() {
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleSave = async (e) => {
+  const handleSave = async (e, form) => {
     e.preventDefault();
     setSaving(true);
-    await usersAPI.updateProfile(user?._id, form);
+    const updateData = {
+      name: form.name,
+      bloodGroup: form.bloodGroup,
+      district: form.district,
+      upazila: form.upazila,
+    }
+    const data = await userUpdate(form.id , updateData, "updateProfile");
+    if (data?.message?.id) {
+      setUser(data.message);
+      setForm(data.message);
+      toast.success("Profile updated successfully!");
+    }
+    if (!data?.message?.id) {
+      toast.error("Something went wrong. Please try again later.")
+    }
     setSaving(false);
     setEditing(false);
     setSaved(true);
@@ -107,7 +122,7 @@ export default function ProfilePage() {
 
       {/* Form */}
       <div className={`bg-white border ${editing ? "border-black/20" : "border-border"} rounded-2xl p-6`}>
-        <form onSubmit={handleSave} className="space-y-5">
+        <form onSubmit={(e) => handleSave(e, form)} className="space-y-5">
           <Field label="Full Name">
             {/* 3. ✅ FIXED: Changed defaultValue to value, bound onChange, added conditional string fallback */}
             <input
