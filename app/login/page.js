@@ -170,7 +170,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-ash mt-6">
             {"Don't have an account? "}
-            <Link href="/register" className="text-wine font-semibold hover:underline">
+            <Link href={`/register${redirectTo == '/' ? '': '?redirect=' + redirectTo}`} className="text-wine font-semibold hover:underline">
               Register for free
             </Link>
           </p>

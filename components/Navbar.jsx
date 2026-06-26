@@ -10,7 +10,8 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { mockCurrentUser } from "@/lib/mockData";
+import { useSession } from "@/lib/auth-client";
+// import { mockCurrentUser } from "@/lib/mockData";
 
 const NAV_LINKS = [
   { label: "Donation Requests", href: "/donation-requests" },
@@ -18,15 +19,22 @@ const NAV_LINKS = [
   { label: "Funding", href: "/funding" },
 ];
 
-// Fake auth state – swap with real context/hook when backend is ready
-const MOCK_LOGGED_IN = true;
-
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loggedIn] = useState(MOCK_LOGGED_IN);
-  const user = mockCurrentUser;
+  const [loggedIn, setLoggedIn] = useState(false);
+  const {data: session} = useSession();
+  const user = session?.user;
+
+  useEffect(() => {
+    if (session?.user) {
+      setLoggedIn(true)
+    }
+    else{
+      setLoggedIn(false);
+    }
+  }, [session])
 
   const isHero = pathname === "/";
 

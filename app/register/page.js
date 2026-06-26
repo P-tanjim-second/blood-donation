@@ -257,7 +257,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-ash mt-5">
             Already have an account?{" "}
-            <Link href="/login" className="text-wine font-semibold hover:underline">
+            <Link href={`/login${redirectTo == '/' ? '': '?redirect=' + redirectTo}`} className="text-wine font-semibold hover:underline">
               Sign in
             </Link>
           </p>
