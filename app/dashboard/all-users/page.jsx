@@ -5,8 +5,8 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from "@heroui/react";
 import { usersAPI } from "@/lib/api";
-import { authClient } from "@/lib/auth-client";
-
+import { getAllUser, userUpdate } from "@/lib/api/user/user";
+import toast from "react-hot-toast";
 const STATUS_FILTER = ["all", "active", "blocked"];
 const ROLE_CHIP = {
   admin:     { color: "danger",  label: "Admin" },
@@ -21,23 +21,37 @@ export default function AllUsersPage() {
 
   const loadUsers = async () => {
     setLoading(true);
-    const { data: users, error } = await authClient.admin.listUsers() 
+    const users= await getAllUser();
     console.log(users)
-    setUsers(users.users);
+    setUsers(users);
     setLoading(false);
   };
 
   useEffect(() => { loadUsers(); }, []);
 
   const handleRoleChange = async (userId, role) => {
-    await usersAPI.updateRole(userId, role);
-    setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role } : u));
+    const data = await userUpdate(userId, {role}, 'updateRole')
+    console.log(data)
+    if (data.message.user.id) {
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role } : u));
+      toast.success(`${data.message.user.name} is now ${data.message.user.role}`)
+    }
+    if(!data.message.user.id){
+      toast.error("Something went wrong. Please try again later")
+    }
   };
 
   const handleStatusToggle = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "blocked" : "active";
-    await usersAPI.updateStatus(userId, newStatus);
-    setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
+    const data = await userUpdate(userId, {status: newStatus}, 'updateStatus')
+    if (data.message.id) {
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
+      toast.success(`${data.message.name} is now ${data.message.status}`)
+    }
+    if(!data.message.id){
+      toast.error("Something went wrong. Please try again later")
+    }
+    // 
   };
 
   return (
@@ -56,7 +70,7 @@ export default function AllUsersPage() {
             className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${
               statusFilter === s
                 ? "bg-wine text-white border-wine"
-                : "bg-surface border-border text-ash hover:text-charcoal"
+                : "bg-white border-border text-ash hover:text-charcoal"
             }`}
           >
             {s}
@@ -64,7 +78,7 @@ export default function AllUsersPage() {
         ))}
       </div>
 
-      <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+      <div className="bg-white border border-border rounded-2xl overflow-hidden">
         {loading ? (
           <div className="p-8 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -139,7 +153,7 @@ export default function AllUsersPage() {
                             </Button>
                           </DropdownTrigger>
                           <DropdownMenu aria-label="User actions">
-                            {u.status === "Active" ? (
+                            {u.status === "active" ? (
                               <DropdownItem key="block" color="danger" className="text-danger"
                                 onPress={() => handleStatusToggle(u.id, u.status)}>
                                 Block User

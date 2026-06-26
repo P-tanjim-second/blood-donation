@@ -51,8 +51,9 @@ export default function CreateDonationRequestPage() {
   if (user?.status === 'Blocked' || user?.status === 'blocked') {
     toast.error("You are Blocked by admin.");
     return (
-      <div className="h-screen bg-wine flex justify-center items-center">
-        <h1 className="font-display text-4xl font-bold text-white">404 | Not Found</h1>
+      <div className="h-screen flex flex-col gap-3 justify-center items-center">
+        <h1 className="font-display text-4xl font-bold text-white">You are blocked by admin.</h1>
+        <p className="font-display text-base text-charcoal/40 font-medium">Please contact admin for more information</p>
       </div>
     );
   }

@@ -72,7 +72,7 @@ export default function RegisterFormPage({redirectTo}) {
       upazila: form.upazila,
       bloodGroup: form.bloodGroup,
       role: 'donor',
-      status: 'Active'
+      status: 'active'
     }
     try {
       const {data, error} = await signUp.email(user);
