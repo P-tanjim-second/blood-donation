@@ -87,7 +87,7 @@ export default function DashboardPage() {
     donationRequestsAPI
       .getMyRequests({ limit: 3 })
       .then(({ requests }) => {
-        // setRecentRequests(requests);
+        setRecentRequests(requests);
         setLoadingReqs(false);
       });
   }, []);
@@ -100,10 +100,14 @@ export default function DashboardPage() {
         <div className="absolute inset-0 opacity-[0.04] dot-bg" />
         <div className="relative">
           <p className="text-ivory/60 text-sm font-mono">Welcome back 👋</p>
-          <h1 className="font-display capitalize text-3xl sm:text-4xl font-medium text-ivory mt-1">
+          {user ? <h1 className="font-display capitalize text-3xl sm:text-4xl font-medium text-ivory mt-1">
             {user?.name}
-          </h1>
-          <p className="text-ivory/60 text-sm mt-1 capitalize">{user?.role} · {user?.bloodGroup}</p>
+          </h1> :
+            <h1 className="font-display capitalize text-3xl sm:text-4xl font-medium text-ivory mt-1">Loading...</h1>
+          }
+          {user ? <p className="text-ivory/60 text-sm mt-1 capitalize">{user?.role} · {user?.bloodGroup}</p> :
+            <p className="h-5 w-20 rounded-lg bg-cream animate-pulse mt-1"></p>
+          }
         </div>
         {user?.role === "donor" && (
           <div className="relative">
@@ -137,9 +141,59 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          {loadingReqs ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => <div key={i} className="h-16 rounded-xl bg-parchment animate-pulse" />)}
+          <div className="bg-white border border-border rounded-2xl overflow-hidden">
+            {loadingReqs ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-cream">
+                    {["Recipient", "Location", "Blood", "Date", "Status", "Actions"].map((h) => (
+                      <th
+                        key={h}
+                        className="text-left px-5 py-3.5 text-xs font-semibold text-ash uppercase tracking-wider"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-border bg-white">
+                  {[...Array(3)].map((_, i) => (
+                    <tr key={i}>
+                      {/* Recipient */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-20 rounded bg-cream animate-pulse" />
+                      </td>
+
+                      {/* Location */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-32 rounded bg-cream animate-pulse" />
+                      </td>
+
+                      {/* Blood */}
+                      <td className="px-5 py-4">
+                        <div className="h-7 w-14 rounded-lg bg-cream animate-pulse" />
+                      </td>
+
+                      {/* Date */}
+                      <td className="px-5 py-4">
+                        <div className="h-4 w-36 rounded bg-cream animate-pulse" />
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-5 py-4">
+                        <div className="h-7 w-20 rounded-full bg-cream animate-pulse" />
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-4">
+                        <div className="h-8 w-8 rounded-lg bg-cream animate-pulse" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : recentRequests.length === 0 ? (
             <div className="bg-cream rounded-2xl p-10 text-center">
@@ -194,6 +248,7 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+          </div>
         </div>
       )}
 
