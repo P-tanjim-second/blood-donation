@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -8,7 +9,7 @@ const GOOGLE_FONTS_URL =
 
 export const metadata = {
   title: {
-    default: "Vitae — Blood Donation Platform",
+    default: "Vitae - Blood Donation Platform",
     template: "%s | Vitae",
   },
   description:
@@ -25,7 +26,10 @@ export default function RootLayout({ children }) {
         <link href={GOOGLE_FONTS_URL} rel="stylesheet" />
       </head>
       <body className="bg-ivory text-charcoal antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Toaster position="bottom right"></Toaster>
+        </Providers>
       </body>
     </html>
   );

@@ -2,8 +2,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button, Input } from "@heroui/react";
-import { useRouter } from "next/navigation";
-import { authAPI } from "@/lib/api";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,14 +12,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const data = await authAPI.login(form);
-      if (data.success) router.push("/dashboard");
+      const {data, error} = await signIn.email(form);
+      if (data) {
+        router.push(redirectTo)
+        toast.success("Login successfull.")
+      };
+      if (error) {
+        toast.error(error.message);
+      };
     } catch {
       setError("Invalid email or password. Please try again.");
     } finally {

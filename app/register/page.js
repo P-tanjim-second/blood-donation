@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Button, Select, SelectItem } from "@heroui/react";
-import { useRouter } from "next/navigation";
-// import { authAPI } from "@/lib/api";
+import { avatar, Button, Select, SelectItem } from "@heroui/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { CustomSelect } from "@/components/CustomSelect";
+import { signUp, useSession } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,6 +14,8 @@ export default function RegisterPage() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
   const [form, setForm] = useState({
     name: "", email: "", password: "", confirmPassword: "",
     bloodGroup: "", district: "", upazila: "", avatar: "",
@@ -27,22 +30,26 @@ export default function RegisterPage() {
     setUploading(true);
 
     // Preview
-    const reader = new FileReader();
-    reader.onload = (ev) => setAvatarPreview(ev.target.result);
-    reader.readAsDataURL(file);
+    // const reader = new FileReader();
+    // reader.onload = (ev) => setAvatarPreview(ev.target.result);
+    // reader.readAsDataURL(file);
 
     // Upload to imageBB
-    // const data = new FormData();
-    // data.append("image", file);
-    // const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_KEY}`, { method:"POST", body: data });
-    // const json = await res.json();
-    // setForm(f => ({ ...f, avatar: json.data.url }));
-
-    // Mock: just set a placeholder
-    setTimeout(() => {
-      setForm((f) => ({ ...f, avatar: "https://i.pravatar.cc/150?img=4" }));
+    try {
+      const data = new FormData();
+      data.append("image", file);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.NEXT_PUBLIC_IMGBB_KEY}`, { method: "POST", body: data });
+      const json = await res.json();
+      if (json.success) {
+        setAvatarPreview(json.data.url)
+        setForm(f => ({ ...f, avatar: json.data.url }));
+      }
+    } catch {
+      setError("Image upload failed. Please try again.");
+    }
+    finally {
       setUploading(false);
-    }, 800);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -57,11 +64,32 @@ export default function RegisterPage() {
       return;
     }
     setLoading(true);
+    console.log(form)
+    const user = {
+      name: form.name,
+      email: form.email,
+      password: form.confirmPassword,
+      avatar: form.avatar,
+      district: form.district,
+      upazila: form.upazila,
+      bloodGroup: form.bloodGroup,
+      role: 'donor',
+      status: 'Active'
+    }
     try {
-      // const res = await authAPI.register(form);
-      if (res.success) router.push("/login?registered=1");
-    } catch {
+      const {data, error} = await signUp.email(user);
+      console.log(data)
+      if (data) {
+        toast.success("Registration successfull.")
+        router.push(redirectTo);
+      }
+      if (error) {
+        toast.error(error.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
       setError("Registration failed. Please try again.");
+      
     } finally {
       setLoading(false);
     }
