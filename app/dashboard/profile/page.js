@@ -6,31 +6,39 @@ import { mockCurrentUser, BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockDa
 import { getUser } from "@/lib/api/user/user";
 import { CustomSelect } from "@/components/CustomSelect";
 
+// 1. ✅ FIXED: Moved Field component outside to prevent input elements from remounting on keystroke
+const Field = ({ label, children }) => (
+  <div>
+    <label className="form-label">{label}</label>
+    {children}
+  </div>
+);
+
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  
+  // 2. ✅ FIXED: Initialize cleanly to avoid controlled/uncontrolled errors
   const [form, setForm] = useState({
-    name: user?.name,
-    avatar: user?.avatar,
-    bloodGroup: user?.bloodGroup,
-    district: user?.district,
-    upazila: user?.upazila,
+    name: "",
+    avatar: "",
+    bloodGroup: "",
+    district: "",
+    upazila: "",
   });
-
 
   useEffect(() => {
     async function session() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user);
-        setForm(session.user)
+        setForm(session.user);
       }
     }
     session();
   }, []);
-
 
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -38,20 +46,12 @@ export default function ProfilePage() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-    // TODO: wire to real API
     await usersAPI.updateProfile(user?._id, form);
     setSaving(false);
     setEditing(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
-
-  const Field = ({ label, children }) => (
-    <div>
-      <label className="form-label">{label}</label>
-      {children}
-    </div>
-  );
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -109,11 +109,12 @@ export default function ProfilePage() {
       <div className={`bg-white border ${editing ? "border-black/20" : "border-border"} rounded-2xl p-6`}>
         <form onSubmit={handleSave} className="space-y-5">
           <Field label="Full Name">
+            {/* 3. ✅ FIXED: Changed defaultValue to value, bound onChange, added conditional string fallback */}
             <input
               className="form-input"
-              defaultValue={form.name}
+              value={form.name || ""}
               readOnly={!editing}
-              onChange={() => { }}
+              onChange={(e) => update("name", e.target.value)}
               required
             />
           </Field>
@@ -122,7 +123,7 @@ export default function ProfilePage() {
             <input
               type="email"
               className="form-input"
-              value={user?.email}
+              value={user?.email || ""}
               readOnly
             />
           </Field>
@@ -134,10 +135,9 @@ export default function ProfilePage() {
               className="form-input"
               value={form.bloodGroup}
               disable={!editing}
-              onChange={(e) => update("bloodGroup", e.target.value)}
+              onChange={(val) => update("bloodGroup", val)}
               required
-            >
-            </CustomSelect>
+            />
           </Field>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -147,21 +147,20 @@ export default function ProfilePage() {
                 className="form-input"
                 value={form.district}
                 disable={!editing}
-                onChange={(e) => { update("district", e.target.value); update("upazila", ""); }}
+                onChange={(val) => { update("district", val); update("upazila", ""); }}
                 required
-              >
-              </CustomSelect>
+              />
             </Field>
             <Field label="Upazila">
               <CustomSelect
+                placeholder={"Select Your Upazila"}
                 options={upazilas}
                 className="form-input"
                 value={form.upazila}
                 disable={!editing}
-                onChange={(e) => update("upazila", e.target.value)}
+                onChange={(val) => update("upazila", val)}
                 required
-              >
-              </CustomSelect>
+              />
             </Field>
           </div>
 
