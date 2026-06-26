@@ -48,17 +48,7 @@ export default function HeroSection() {
 
           {/* Left: Text  */}
           <div className="lg:col-span-7 space-y-7">
-            {/* Eyebrow badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2.5 px-4 py-2
-                         border border-wine/25 rounded-full bg-wine/4 backdrop-blur-sm"
-            >
-              <span className="w-2 h-2 rounded-full bg-wine animate-pulse" />
-              <span className="eyebrow">Blood Donation Platform · Bangladesh</span>
-            </motion.div>
+            
 
             {/* Headline */}
             <div>
@@ -109,7 +99,7 @@ export default function HeroSection() {
                   size="lg"
                   className="bg-wine text-white font-semibold px-7 rounded-full
                              hover:bg-wine-dark transition-all duration-250 shadow-wine-sm
-                             hover:shadow-wine hover:-translate-y-0.5"
+                             hover:-translate-y-0.5"
                 >
                   Become a Donor
                 </Button>
