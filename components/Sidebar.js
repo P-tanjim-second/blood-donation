@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { Avatar, Button, Chip } from "@heroui/react";
-import { mockCurrentUser } from "@/lib/mockData";
-import { getUser } from "@/lib/api/user";
+import { getUser } from "@/lib/api/user/user";
 
 // Icons (inline SVG for zero-dep) 
 const Icon = ({ d, size = 18 }) => (
@@ -63,12 +62,12 @@ export default function Sidebar() {
 
 
   useEffect(() => {
-    async function session(){
+    async function session() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
       }
-      else{
+      else {
         redirect('/login')
       }
     }
@@ -152,13 +151,13 @@ export default function Sidebar() {
     <>
       {/* Desktop sidebar */}
       <aside
-        className={`hidden md:flex flex-col bg-surface border-r border-border h-screen sticky top-0
+        className={`hidden md:flex flex-col bg-white border-r border-border h-screen sticky top-0
                     transition-all duration-300 shrink-0 ${collapsed ? "w-16" : "w-60"}`}
       >
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-[70px] w-6 h-6 rounded-full bg-surface border border-border
+          className="absolute -right-3 top-[70px] w-6 h-6 rounded-full bg-white border border-border
                      flex items-center justify-center shadow-card hover:bg-cream transition-colors z-10"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
@@ -184,7 +183,7 @@ export default function Sidebar() {
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div className="absolute inset-0 bg-charcoal/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)} />
-          <div className="relative w-60 bg-surface h-full shadow-2xl flex flex-col">
+          <div className="relative w-60 bg-white h-full shadow-2xl flex flex-col">
             <button
               onClick={() => setMobileOpen(false)}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center

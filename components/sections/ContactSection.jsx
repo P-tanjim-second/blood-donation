@@ -173,7 +173,7 @@ export function ContactSection() {
               Get in Touch
             </h2>
             <p className="text-ash text-base leading-relaxed mb-10 max-w-sm reveal" data-delay="3">
-              Have questions, partnership inquiries, or need emergency help? 
+              Have questions, partnership inquiries, or need emergency help?
               Reach out and we will respond within 24 hours.
             </p>
 
@@ -197,7 +197,7 @@ export function ContactSection() {
 
           {/* Right: Form */}
           <div className="lg:col-span-7 reveal" data-delay="3">
-            <div className="bg-surface border border-border rounded-2xl p-8 shadow-card">
+            <div className="bg-white border border-border rounded-2xl p-8 shadow-card">
               {sent && (
                 <div className="mb-5 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
                   ✓ Message sent! We will get back to you shortly.

@@ -48,7 +48,7 @@ export default function HeroSection() {
 
           {/* Left: Text  */}
           <div className="lg:col-span-7 space-y-7">
-            
+
 
             {/* Headline */}
             <div>
@@ -163,7 +163,7 @@ export default function HeroSection() {
                   >
                     <div
                       className="aspect-square flex flex-col items-center justify-center
-                                 border border-border rounded-xl bg-surface cursor-default"
+                                 border border-border rounded-xl bg-white cursor-default"
                     >
                       <span
                         className="bt-label font-display text-2xl font-semibold text-wine

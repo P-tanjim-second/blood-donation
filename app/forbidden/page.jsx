@@ -92,13 +92,13 @@ export default function Forbidden() {
 
         {/* Role hint card */}
         <div
-          className="w-full max-w-sm rounded-2xl border border-border bg-surface
+          className="w-full max-w-sm rounded-2xl border border-border bg-white
                      divide-y divide-border overflow-hidden hero-enter hero-enter-4"
         >
           {[
-            { role: "Admin",     access: "Full platform access",          color: "text-rose-600  bg-rose-50" },
-            { role: "Volunteer", access: "Manage donation requests",       color: "text-amber-600 bg-amber-50" },
-            { role: "Donor",     access: "Create & manage your requests",  color: "text-blue-600  bg-blue-50" },
+            { role: "Admin", access: "Full platform access", color: "text-rose-600  bg-rose-50" },
+            { role: "Volunteer", access: "Manage donation requests", color: "text-amber-600 bg-amber-50" },
+            { role: "Donor", access: "Create & manage your requests", color: "text-blue-600  bg-blue-50" },
           ].map(({ role, access, color }) => (
             <div key={role} className="flex items-center justify-between px-5 py-3.5 gap-4">
               <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg shrink-0 ${color}`}>
@@ -133,8 +133,8 @@ export default function Forbidden() {
         {/* Bottom nav links */}
         <div className="flex items-center gap-6 pt-1 hero-enter hero-enter-5">
           {[
-            { label: "Dashboard",  href: "/dashboard" },
-            { label: "Sign In",    href: "/login" },
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Sign In", href: "/login" },
             { label: "Contact Us", href: "/#contact" },
           ].map(({ label, href }) => (
             <div key={label} className="flex items-center gap-2">

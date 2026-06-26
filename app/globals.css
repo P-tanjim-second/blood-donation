@@ -279,6 +279,7 @@ body {
   box-shadow: 0 0 0 3px rgba(139, 26, 47, 0.08);
 }
 .form-input:read-only {
+  pointer-events: none;
   background: var(--c-bg-alt);
   color: var(--c-text-3);
   cursor: not-allowed;

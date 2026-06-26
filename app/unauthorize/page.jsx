@@ -109,7 +109,7 @@ export default function Authorize() {
         {/* Info strip */}
         <div
           className="flex items-center gap-3 px-5 py-3 rounded-full border border-border
-                     bg-surface/80 backdrop-blur-sm hero-enter hero-enter-5"
+                     bg-white/80 backdrop-blur-sm hero-enter hero-enter-5"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-wine/50 shrink-0" />
           <p className="text-xs text-ash">

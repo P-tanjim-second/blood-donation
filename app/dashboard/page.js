@@ -5,18 +5,18 @@ import { Button, Chip } from "@heroui/react";
 import { donationRequestsAPI, statsAPI } from "@/lib/api";
 import { mockCurrentUser } from "@/lib/mockData";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/api/user";
+import { getUser } from "@/lib/api/user/user";
 
 const STATUS_CHIP = {
-  pending:    { color: "warning",  label: "Pending" },
-  inprogress: { color: "primary",  label: "In Progress" },
-  done:       { color: "success",  label: "Done" },
-  canceled:   { color: "danger",   label: "Canceled" },
+  pending: { color: "warning", label: "Pending" },
+  inprogress: { color: "primary", label: "In Progress" },
+  done: { color: "success", label: "Done" },
+  canceled: { color: "danger", label: "Canceled" },
 };
 
 function StatCard({ icon, label, value, sub, color = "wine" }) {
   return (
-    <div className="bg-surface rounded-2xl border border-border p-6 shadow-card hover-lift">
+    <div className="bg-white rounded-2xl border border-border p-6 shadow-card hover-lift">
       <div className="flex items-start justify-between">
         <div className={`w-11 h-11 rounded-xl flex items-center justify-center
           ${color === "wine" ? "bg-wine/8 text-wine" :
@@ -61,18 +61,18 @@ const ICON_MONEY = (
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   useEffect(() => {
-    async function session(){
+    async function session() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
       }
-      else{
+      else {
         redirect('/login')
       }
     }
     session()
   }, [])
-  
+
   const isAdmin = user?.role === "admin";
   const isVolunteer = user?.role === "volunteer";
 
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => <div key={i} className="h-16 rounded-xl bg-parchment animate-pulse" />)}
             </div>
           ) : recentRequests.length === 0 ? (
-            <div className="bg-surface border border-border rounded-2xl p-10 text-center">
+            <div className="bg-white border border-border rounded-2xl p-10 text-center">
               <p className="text-ash text-sm mb-4">You haven't made any donation requests yet.</p>
               <Link href="/dashboard/create-donation-request">
                 <Button className="bg-wine text-white font-semibold rounded-full">
@@ -151,7 +151,7 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+            <div className="bg-white border border-border rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
               { label: "All Donation Requests", desc: "View and manage every request", href: "/dashboard/all-blood-donation-request", color: "bg-blue-50 text-blue-700" },
             ].map((item) => (
               <Link key={item.href} href={item.href}>
-                <div className="bg-surface border border-border rounded-2xl p-5 hover-lift cursor-pointer">
+                <div className="bg-white border border-border rounded-2xl p-5 hover-lift cursor-pointer">
                   <div className={`inline-flex px-3 py-1 rounded-lg text-xs font-semibold mb-3 ${item.color}`}>
                     Quick Access
                   </div>

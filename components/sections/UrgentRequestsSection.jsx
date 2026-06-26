@@ -33,7 +33,7 @@ const BG_COLORS = {
 function RequestCard({ req, index }) {
   return (
     <div
-      className="reveal hover-lift bg-surface rounded-2xl border border-border p-6 flex flex-col gap-4"
+      className="reveal hover-lift bg-white rounded-2xl border border-border p-6 flex flex-col gap-4"
       data-delay={String(index + 1)}
     >
       {/* Top row */}

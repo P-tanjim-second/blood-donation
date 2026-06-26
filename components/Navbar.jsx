@@ -11,7 +11,7 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import { signOut, useSession } from "@/lib/auth-client";
-import { getUser } from "@/lib/api/user";
+import { getUser } from "@/lib/api/user/user";
 
 const NAV_LINKS = [
   { label: "Donation Requests", href: "/donation-requests" },
@@ -68,8 +68,8 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled
-            ? "bg-ivory/90 backdrop-blur-[14px] border-b border-border shadow-sm"
-            : "bg-transparent"
+          ? "bg-ivory/90 backdrop-blur-[14px] border-b border-border shadow-sm"
+          : "bg-transparent"
           }`}
       >
         <div className="max-w-8xl mx-auto px-5 lg:px-10">
@@ -97,8 +97,8 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${pathname === link.href
-                      ? "text-wine bg-wine/6"
-                      : "text-slate hover:text-charcoal hover:bg-parchment/60"
+                    ? "text-wine bg-wine/6"
+                    : "text-slate hover:text-charcoal hover:bg-parchment/60"
                     }`}
                 >
                   {link.label}
@@ -200,8 +200,8 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
                 className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
-                    ? "text-wine bg-wine/8"
-                    : "text-slate hover:text-charcoal hover:bg-cream"
+                  ? "text-wine bg-wine/8"
+                  : "text-slate hover:text-charcoal hover:bg-cream"
                   }`}
               >
                 {link.label}

@@ -89,7 +89,7 @@ export default function FeaturesSection() {
           </div>
           <div className="lg:col-span-6 lg:flex lg:items-end">
             <p className="text-base text-ash leading-relaxed max-w-md reveal" data-delay="3">
-              Blood cannot be manufactured. It can only come from people who choose 
+              Blood cannot be manufactured. It can only come from people who choose
               to give. Vitae makes that connection frictionless, fast, and trustworthy.
             </p>
           </div>
@@ -100,7 +100,7 @@ export default function FeaturesSection() {
           {FEATURES.map((f, i) => (
             <div
               key={f.title}
-              className="reveal hover-lift group bg-surface rounded-2xl p-7 border border-border
+              className="reveal hover-lift group bg-white rounded-2xl p-7 border border-border
                          cursor-default"
               data-delay={String(i + 1)}
             >
