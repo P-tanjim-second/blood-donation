@@ -11,7 +11,7 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import { useSession } from "@/lib/auth-client";
-// import { mockCurrentUser } from "@/lib/mockData";
+import { getUser } from "@/lib/api/user";
 
 const NAV_LINKS = [
   { label: "Donation Requests", href: "/donation-requests" },
@@ -24,17 +24,20 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const {data: session} = useSession();
-  const user = session?.user;
+
 
   useEffect(() => {
-    if (session?.user) {
-      setLoggedIn(true)
+    async function session() {
+      const session = await getUser();
+      if (session?.user) {
+        setLoggedIn(true)
+      }
+      else {
+        setLoggedIn(false);
+      }
     }
-    else{
-      setLoggedIn(false);
-    }
-  }, [session])
+    session();
+  }, [])
 
   const isHero = pathname === "/";
 
@@ -58,11 +61,10 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-400 ${scrolled
             ? "bg-ivory/90 backdrop-blur-[14px] border-b border-border shadow-sm"
             : "bg-transparent"
-        }`}
+          }`}
       >
         <div className="max-w-8xl mx-auto px-5 lg:px-10">
           <div className="flex items-center justify-between h-16">
@@ -88,11 +90,10 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${
-                    pathname === link.href
+                  className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-colors duration-150 ${pathname === link.href
                       ? "text-wine bg-wine/6"
                       : "text-slate hover:text-charcoal hover:bg-parchment/60"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -175,18 +176,16 @@ export default function Navbar() {
 
       {/* Mobile overlay */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div
           className="absolute inset-0 bg-charcoal/30 backdrop-blur-sm"
           onClick={() => setMenuOpen(false)}
         />
         <div
-          className={`absolute top-16 left-0 right-0 bg-ivory border-b border-border transition-all duration-300 ${
-            menuOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
-          }`}
+          className={`absolute top-16 left-0 right-0 bg-ivory border-b border-border transition-all duration-300 ${menuOpen ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
+            }`}
         >
           <nav className="px-5 pt-4 pb-6 flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
@@ -194,11 +193,10 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                  pathname === link.href
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition-colors ${pathname === link.href
                     ? "text-wine bg-wine/8"
                     : "text-slate hover:text-charcoal hover:bg-cream"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
