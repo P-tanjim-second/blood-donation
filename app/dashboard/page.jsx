@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 import { donationRequestsAPI, statsAPI } from "@/lib/api";
-import { mockCurrentUser } from "@/lib/mockData";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/api/user/user";
 
@@ -65,11 +64,13 @@ export default function DashboardPage() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
+        console.log(session.user)
       }
       else {
         redirect('/login')
       }
     }
+    
     session()
   }, [])
 
@@ -90,7 +91,7 @@ export default function DashboardPage() {
         setRecentRequests(requests);
         setLoadingReqs(false);
       });
-  }, []);
+  }, [user]);
 
   return (
     <div className="space-y-8">
