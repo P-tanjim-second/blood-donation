@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Avatar, Chip } from "@heroui/react";
+import { redirect, usePathname } from "next/navigation";
+import { Avatar, Button, Chip } from "@heroui/react";
 import { mockCurrentUser } from "@/lib/mockData";
+import { getUser } from "@/lib/api/user";
 
 // Icons (inline SVG for zero-dep) 
 const Icon = ({ d, size = 18 }) => (
@@ -57,11 +58,29 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const user = mockCurrentUser;
-  const navItems = getNavItems(user.role);
+  const [user, setUser] = useState(null);
+  const navItems = getNavItems(user?.role) || 'donor';
+
+
+  useEffect(() => {
+    async function session(){
+      const session = await getUser();
+      if (session?.user) {
+        setUser(session.user)
+      }
+      else{
+        redirect('/login')
+      }
+    }
+    session()
+  }, [])
+
+  const handleSignOut = async () => {
+    await signOut();
+  }
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-white/70">
       {/* Logo */}
       <div className={`flex items-center gap-3 px-5 h-16 border-b border-border shrink-0 ${collapsed ? "justify-center px-3" : ""}`}>
         <div className="w-7 h-7 rounded-full bg-wine flex items-center justify-center shrink-0">
@@ -100,24 +119,29 @@ export default function Sidebar() {
       {/* User info */}
       <div className={`p-3 border-t border-border shrink-0 ${collapsed ? "flex justify-center" : ""}`}>
         {collapsed ? (
-          <Avatar src={user.avatar} name={user.name} size="sm" />
+          <Avatar src={user?.avatar} name={user?.name} size="sm" />
         ) : (
           <div className="flex items-center gap-3 px-2 py-2">
-            <Avatar src={user.avatar} name={user.name} size="sm" className="shrink-0" />
+            <Avatar src={user?.avatar} name={user?.name} size="sm" className="shrink-0" />
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-charcoal truncate">{user.name}</p>
+              <p className="text-sm font-semibold text-charcoal truncate">{user?.name}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <Chip
                   size="sm"
                   variant="flat"
-                  color={ROLE_COLORS[user.role] || "default"}
+                  color={ROLE_COLORS[user?.role] || "default"}
                   className="h-4 text-[10px] px-1.5 capitalize"
                 >
-                  {user.role}
+                  {user?.role}
                 </Chip>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
               </div>
             </div>
+            <Link href="/login" onClick={handleSignOut}>
+              <Button variant="bordered" className="w-full border-border text-slate rounded-xl">
+                Log out
+              </Button>
+            </Link>
           </div>
         )}
       </div>

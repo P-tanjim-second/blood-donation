@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 import { donationRequestsAPI, statsAPI } from "@/lib/api";
 import { mockCurrentUser } from "@/lib/mockData";
+import { redirect } from "next/navigation";
+import { getUser } from "@/lib/api/user";
 
 const STATUS_CHIP = {
   pending:    { color: "warning",  label: "Pending" },
@@ -57,9 +59,22 @@ const ICON_MONEY = (
 );
 
 export default function DashboardPage() {
-  const user = mockCurrentUser;
-  const isAdmin = user.role === "admin";
-  const isVolunteer = user.role === "volunteer";
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    async function session(){
+      const session = await getUser();
+      if (session?.user) {
+        setUser(session.user)
+      }
+      else{
+        redirect('/login')
+      }
+    }
+    session()
+  }, [])
+  
+  const isAdmin = user?.role === "admin";
+  const isVolunteer = user?.role === "volunteer";
 
   const [stats, setStats] = useState(null);
   const [recentRequests, setRecentRequests] = useState([]);
@@ -85,12 +100,12 @@ export default function DashboardPage() {
         <div className="absolute inset-0 opacity-[0.04] dot-bg" />
         <div className="relative">
           <p className="text-ivory/60 text-sm font-mono">Welcome back 👋</p>
-          <h1 className="font-display text-3xl sm:text-4xl font-medium text-ivory mt-1">
-            {user.name}
+          <h1 className="font-display capitalize text-3xl sm:text-4xl font-medium text-ivory mt-1">
+            {user?.name}
           </h1>
-          <p className="text-ivory/60 text-sm mt-1 capitalize">{user.role} · {user.bloodGroup}</p>
+          <p className="text-ivory/60 text-sm mt-1 capitalize">{user?.role} · {user?.bloodGroup}</p>
         </div>
-        {user.role === "donor" && (
+        {user?.role === "donor" && (
           <div className="relative">
             <Link href="/dashboard/create-donation-request">
               <Button className="bg-ivory text-wine font-semibold rounded-full hover:bg-cream transition-colors">

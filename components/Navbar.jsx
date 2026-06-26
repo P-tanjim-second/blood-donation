@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { useSession } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
 import { getUser } from "@/lib/api/user";
 
 const NAV_LINKS = [
@@ -24,6 +24,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function Navbar() {
       const session = await getUser();
       if (session?.user) {
         setLoggedIn(true)
+        setUser(session.user)
       }
       else {
         setLoggedIn(false);
@@ -57,6 +59,10 @@ export default function Navbar() {
     else document.body.style.overflow = "";
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
+
+  const handleSignOut = async () => {
+    await signOut();
+  }
 
   return (
     <>
@@ -135,7 +141,7 @@ export default function Navbar() {
                     </DropdownItem>
                     <DropdownItem key="logout" color="danger" className="text-danger"
                       textValue="Logout">
-                      <Link href="/login" className="block w-full">
+                      <Link href="/login" onClick={handleSignOut} className="block w-full">
                         Log out
                       </Link>
                     </DropdownItem>
