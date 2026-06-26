@@ -87,7 +87,7 @@ export default function DashboardPage() {
     donationRequestsAPI
       .getMyRequests({ limit: 3 })
       .then(({ requests }) => {
-        setRecentRequests(requests);
+        // setRecentRequests(requests);
         setLoadingReqs(false);
       });
   }, []);
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => <div key={i} className="h-16 rounded-xl bg-parchment animate-pulse" />)}
             </div>
           ) : recentRequests.length === 0 ? (
-            <div className="bg-white border border-border rounded-2xl p-10 text-center">
+            <div className="bg-cream rounded-2xl p-10 text-center">
               <p className="text-ash text-sm mb-4">You haven't made any donation requests yet.</p>
               <Link href="/dashboard/create-donation-request">
                 <Button className="bg-wine text-white font-semibold rounded-full">

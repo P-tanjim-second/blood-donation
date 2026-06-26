@@ -6,14 +6,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
-export default function LoginPage() {
+export default function LoginPageForm({redirectTo}) {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,8 +20,8 @@ export default function LoginPage() {
     try {
       const {data, error} = await signIn.email(form);
       if (data) {
-        router.push(redirectTo)
         toast.success("Login successfull.")
+        router.push(redirectTo)
       };
       if (error) {
         toast.error(error.message);

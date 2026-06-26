@@ -1,21 +1,19 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { avatar, Button, Select, SelectItem } from "@heroui/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { CustomSelect } from "@/components/CustomSelect";
-import { signUp, useSession } from "@/lib/auth-client";
+import { signUp } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
-export default function RegisterPage() {
+export default function RegisterFormPage({redirectTo}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
   const [form, setForm] = useState({
     name: "", email: "", password: "", confirmPassword: "",
     bloodGroup: "", district: "", upazila: "", avatar: "",
