@@ -17,6 +17,25 @@ const BG_COLORS = {
   "O-":  "bg-sky-50    text-sky-700    border-sky-200",
 };
 
+
+function formatTo12Hour(timeStr) {
+  if (!timeStr) return "";
+
+  // Splits "14:30:00" or "14:30" into hours and minutes
+  const [hoursStr, minutesStr] = timeStr.split(":");
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr;
+
+  // Determine AM or PM
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // The hour '0' should be '12'
+
+  return `${hours}:${minutes} ${ampm}`;
+}
+
 function RequestCard({ req }) {
   return (
     <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4 hover-lift">
@@ -47,7 +66,7 @@ function RequestCard({ req }) {
           },
           {
             icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-            text: `${req.donationDate}  ·  ${req.donationTime}`,
+            text: `${req.donationDate}  ·  ${formatTo12Hour(req.donationTime)}`,
           },
         ].map((item, i) => (
           <div key={i} className="flex items-start gap-2.5">

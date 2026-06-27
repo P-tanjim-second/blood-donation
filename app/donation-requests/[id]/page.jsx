@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { redirect, useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Button,
@@ -11,6 +11,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { donationRequestsAPI } from "@/lib/api";
 import { mockCurrentUser } from "@/lib/mockData";
+import { getUser } from "@/lib/api/user/user";
+import { getRequestById } from "@/lib/api/server/action";
+import { updateRequest } from "@/lib/api/server/mutation";
+import toast from "react-hot-toast";
 
 const BG_COLORS = {
   "A+": "bg-red-50 text-red-700", "B+": "bg-orange-50 text-orange-700",
@@ -28,31 +32,76 @@ function DetailRow({ label, value }) {
   );
 }
 
+function formatTo12Hour(timeStr) {
+  if (!timeStr) return "";
+
+  // Splits "14:30:00" or "14:30" into hours and minutes
+  const [hoursStr, minutesStr] = timeStr.split(":");
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr;
+
+  // Determine AM or PM
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? hours : 12; // The hour '0' should be '12'
+
+  return `${hours}:${minutes} ${ampm}`;
+}
+
 export default function RequestDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const user = mockCurrentUser;
+  const [user, setUser] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [req, setReq]         = useState(null);
+  const [req, setReq] = useState(null);
   const [loading, setLoading] = useState(true);
   const [donating, setDonating] = useState(false);
-  const [donated, setDonated]   = useState(false);
+  const [donated, setDonated] = useState(false);
 
   useEffect(() => {
-    // TODO: wire to real API — redirect to /login if unauthenticated
-    donationRequestsAPI.getById(id).then((data) => {
-      setReq(data);
-      setLoading(false);
-    });
-  }, [id]);
+    async function initializePage() {
+      setLoading(true);
+      try {
+        const session = await getUser();
+        if (!session?.user) {
+          router.replace(`/login?redirect=/donation-requests/${id}`);
+          return;
+        }
+
+        setUser(session.user);
+
+        // 2. Request fetching: Only executes if user session validation passes
+        const res = await getRequestById(id);
+        if (res?.request) {
+          setReq(res.request);
+        }
+      } catch (error) {
+        console.error("Initialization error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    initializePage();
+  }, [id, router]);
+
+  
 
   const handleDonate = async () => {
     setDonating(true);
-    await donationRequestsAPI.donate(req._id, {
+    const res = await updateRequest(req._id, {
       donorName: user.name,
       donorEmail: user.email,
+      status: 'inprogress'
     });
+    if (res.status == 200) {
+      toast.success("Thank you for your donation!");
+    }
+    else{
+        toast.error("Failed to update request!");
+    }
     setReq((r) => ({
       ...r,
       status: "inprogress",
@@ -143,7 +192,7 @@ export default function RequestDetailPage() {
                   <DetailRow label="Hospital" value={req.hospitalName} />
                   <DetailRow label="Full Address" value={req.fullAddress} />
                   <DetailRow label="Location" value={`${req.recipientDistrict}, ${req.recipientUpazila}`} />
-                  <DetailRow label="Date & Time" value={`${req.donationDate} at ${req.donationTime}`} />
+                  <DetailRow label="Date & Time" value={`${req.donationDate} at ${formatTo12Hour(req.donationTime)}`} />
                   <DetailRow label="Blood Group" value={req.bloodGroup} />
                 </dl>
               </div>
@@ -177,8 +226,8 @@ export default function RequestDetailPage() {
                   size="lg"
                   color={
                     req.status === "pending" ? "warning" :
-                    req.status === "inprogress" ? "primary" :
-                    req.status === "done" ? "success" : "danger"
+                      req.status === "inprogress" ? "primary" :
+                        req.status === "done" ? "success" : "danger"
                   }
                   variant="flat"
                   className="text-sm capitalize"
