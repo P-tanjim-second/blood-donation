@@ -75,8 +75,9 @@ export default function CreateDonationRequestPage() {
         status: "pending",
       };
       const res = await postDonationRequest(request);
+      console.log(res)
       if (res.status == 200 || res.status == 201) {
-        toast.success("Donation request created successfully");
+        toast.success(res.message);
         setSuccess(true);
         setTimeout(() => router.push("/dashboard/my-donation-requests"), 2000);
       }
