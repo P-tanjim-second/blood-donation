@@ -30,9 +30,9 @@ const getNavItems = (role) => {
   const common = [
     { label: "Dashboard", href: "/dashboard", icon: "home" },
     { label: "My Profile", href: "/dashboard/profile", icon: "profile" },
+    { label: "My Requests", href: "/dashboard/my-donation-requests", icon: "requests" },
   ];
   const donorItems = [
-    { label: "My Requests", href: "/dashboard/my-donation-requests", icon: "requests" },
     { label: "New Request", href: "/dashboard/create-donation-request", icon: "add" },
   ];
   const adminItems = [

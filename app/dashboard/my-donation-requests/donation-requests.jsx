@@ -254,14 +254,14 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
                               View Details
                             </DropdownItem>
 
-                            <DropdownItem
+                            {(req.status !== "done" && req.status !== "canceled") && <DropdownItem
                               key="edit"
                               as={Link}
                               href={`/dashboard/my-donation-requests/${req._id}/edit`}
                               className=" rounded-xl"
                             >
                               Edit
-                            </DropdownItem>
+                            </DropdownItem>}
 
                             <DropdownItem
                               key="delete"
