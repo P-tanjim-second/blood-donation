@@ -13,7 +13,7 @@ import {
 import { donationRequestsAPI } from "@/lib/api";
 import { getUser } from "@/lib/api/user/user";
 import { toast } from "react-hot-toast"; // Make sure to import toast if you use it
-import { getALlRequests } from "@/lib/api/server/action";
+import { getAllRequests } from "@/lib/api/server/action";
 import TableSkeleton from "@/components/TableSkeleton";
 
 const STATUS_OPTS = ["all", "pending", "inprogress", "done", "canceled"];
@@ -75,7 +75,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await getALlRequests(status, page, limit);
+      const res = await getAllRequests(status, page, limit);
       setRequests(res.requests || []);
       console.log(res);
       setTotalPages(Math.ceil(Number(res.total) / Number(limit)) || 1);

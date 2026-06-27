@@ -6,6 +6,7 @@ import { donationRequestsAPI, statsAPI } from "@/lib/api";
 import { redirect } from "next/navigation";
 import { getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
+import { getAllRequests, getUsersCount } from "@/lib/api/server/action";
 
 const STATUS_CHIP = {
   pending: { color: "warning", label: "Pending" },
@@ -64,6 +65,7 @@ export default function DashboardPage() {
   const [recentRequests, setRecentRequests] = useState([]);
   const [loadingReqs, setLoadingReqs] = useState(true);
   const [totalDonors, setTotalDonors] = useState(0);
+  const [totalRequests, setTotalRequests] = useState(0);
 
 
 
@@ -72,8 +74,12 @@ export default function DashboardPage() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
-        const totalUser = await getAllUsers({ userId: session.user._id });
+        const totalUser = await getUsersCount('donor');
         setTotalDonors(totalUser.total)
+        console.log(totalUser)
+
+        const totalReq = await getAllRequests("all",1,"all")
+        setTotalRequests(totalReq?.total)
       }
       else {
         redirect('/login')
@@ -135,7 +141,7 @@ export default function DashboardPage() {
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard icon={ICON_USER} label="Total Donors" value={totalDonors.toLocaleString()} sub="Registered users" color="wine" />
           <StatCard icon={ICON_MONEY} label="Total Funding" value={`৳${(stats.totalFunding / 1000).toFixed(0)}K`} sub="Community raised" color="amber" />
-          <StatCard icon={ICON_DROP} label="Blood Requests" value={stats.totalRequests.toLocaleString()} sub="All time" color="blue" />
+          <StatCard icon={ICON_DROP} label="Blood Requests" value={totalRequests.toLocaleString()} sub="All time" color="blue" />
         </div>
       )}
 
