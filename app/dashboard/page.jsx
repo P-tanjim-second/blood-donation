@@ -70,11 +70,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function session() {
       const session = await getUser();
-      const totalUser = await getAllUsers({role:'donor'});
-      setTotalDonors(totalUser.total)
-
       if (session?.user) {
         setUser(session.user)
+        const totalUser = await getAllUsers({ userId: session.user._id });
+        setTotalDonors(totalUser.total)
       }
       else {
         redirect('/login')
@@ -86,20 +85,20 @@ export default function DashboardPage() {
   const isAdmin = user?.role === "admin";
   const isVolunteer = user?.role === "volunteer";
 
-  
+
 
   useEffect(() => {
-    
+
     if (isAdmin || isVolunteer) {
       statsAPI.getDashboardStats().then(setStats);
     }
     if (!isAdmin && !isVolunteer) {
       donationRequestsAPI
-      .getMyRequests({ limit: 3 })
-      .then(({ requests }) => {
-        setRecentRequests(requests);
-        setLoadingReqs(false);
-      });
+        .getMyRequests({ limit: 3 })
+        .then(({ requests }) => {
+          setRecentRequests(requests);
+          setLoadingReqs(false);
+        });
     }
   }, [user]);
 
@@ -154,66 +153,66 @@ export default function DashboardPage() {
 
           <div className="bg-white border border-border rounded-2xl overflow-hidden">
             {loadingReqs ? (
-            <TableSkeleton theads={["Recipient", "Location", "Blood", "Date", "Status", "Actions"]}/>
-          ) : recentRequests.length === 0 ? (
-            <div className="bg-cream rounded-2xl p-10 text-center">
-              <p className="text-ash text-sm mb-4">You haven't made any donation requests yet.</p>
-              <Link href="/dashboard/create-donation-request">
-                <Button className="bg-wine text-white font-semibold rounded-full">
-                  Create First Request
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <div className="bg-white border border-border rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-cream">
-                      {["Recipient", "Location", "Blood", "Date", "Status", "Actions"].map((h) => (
-                        <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-ash uppercase tracking-wider">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {recentRequests.map((req) => {
-                      const st = STATUS_CHIP[req.status] || { color: "default", label: req.status };
-                      return (
-                        <tr key={req._id} className="hover:bg-cream/50 transition-colors">
-                          <td className="px-5 py-4 font-medium text-charcoal">{req.recipientName}</td>
-                          <td className="px-5 py-4 text-ash">{req.recipientDistrict}, {req.recipientUpazila}</td>
-                          <td className="px-5 py-4">
-                            <span className="font-mono font-semibold text-wine text-xs px-2 py-1 bg-wine/8 rounded-lg">
-                              {req.bloodGroup}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-ash">{req.donationDate}</td>
-                          <td className="px-5 py-4">
-                            <Chip size="sm" color={st.color} variant="flat">{st.label}</Chip>
-                          </td>
-                          <td className="px-5 py-4">
-                            <Link href={`/donation-requests/${req._id}`}>
-                              <Button size="sm" variant="light" className="text-wine font-medium h-7 px-3">
-                                View
-                              </Button>
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <TableSkeleton theads={["Recipient", "Location", "Blood", "Date", "Status", "Actions"]} />
+            ) : recentRequests.length === 0 ? (
+              <div className="bg-cream rounded-2xl p-10 text-center">
+                <p className="text-ash text-sm mb-4">You haven't made any donation requests yet.</p>
+                <Link href="/dashboard/create-donation-request">
+                  <Button className="bg-wine text-white font-semibold rounded-full">
+                    Create First Request
+                  </Button>
+                </Link>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="bg-white border border-border rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-cream">
+                        {["Recipient", "Location", "Blood", "Date", "Status", "Actions"].map((h) => (
+                          <th key={h} className="text-left px-5 py-3.5 text-xs font-semibold text-ash uppercase tracking-wider">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {recentRequests.map((req) => {
+                        const st = STATUS_CHIP[req.status] || { color: "default", label: req.status };
+                        return (
+                          <tr key={req._id} className="hover:bg-cream/50 transition-colors">
+                            <td className="px-5 py-4 font-medium text-charcoal">{req.recipientName}</td>
+                            <td className="px-5 py-4 text-ash">{req.recipientDistrict}, {req.recipientUpazila}</td>
+                            <td className="px-5 py-4">
+                              <span className="font-mono font-semibold text-wine text-xs px-2 py-1 bg-wine/8 rounded-lg">
+                                {req.bloodGroup}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-ash">{req.donationDate}</td>
+                            <td className="px-5 py-4">
+                              <Chip size="sm" color={st.color} variant="flat">{st.label}</Chip>
+                            </td>
+                            <td className="px-5 py-4">
+                              <Link href={`/donation-requests/${req._id}`}>
+                                <Button size="sm" variant="light" className="text-wine font-medium h-7 px-3">
+                                  View
+                                </Button>
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Admin quick links */}
-      {isAdmin && (
+      {(isAdmin || isVolunteer) && (
         <div>
           <h2 className="font-semibold text-charcoal text-lg mb-4">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 gap-4">

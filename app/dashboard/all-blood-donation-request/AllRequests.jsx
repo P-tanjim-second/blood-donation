@@ -7,6 +7,9 @@ import {
   Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
   useDisclosure,
 } from "@heroui/react";
+import {
+  Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
+} from "@heroui/react";
 import { donationRequestsAPI } from "@/lib/api";
 import { getUser } from "@/lib/api/user/user";
 import { toast } from "react-hot-toast"; // Make sure to import toast if you use it
@@ -72,9 +75,10 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await getALlRequests(status, Number(page), Number(limit));
+      const res = await getALlRequests(status, page, limit);
       setRequests(res.requests || []);
-      setTotalPages(res.totalPages || 1);
+      console.log(res);
+      setTotalPages(Math.ceil(Number(res.total) / Number(limit)) || 1);
     } catch (error) {
       console.error("Failed to load requests:", error);
     } finally {
@@ -144,7 +148,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
             onClick={() => handleNavigate(s, 1)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${status === s
               ? "bg-wine text-white border-wine shadow-sm shadow-wine/20"
-              : "bg-surface border-border text-ash hover:text-charcoal hover:border-wine/30"
+              : "bg-white border-border text-ash hover:text-charcoal hover:border-wine/30"
               }`}
           >
             {s === "all" ? "All" : s}
@@ -153,7 +157,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
       </div>
 
       {/* Table container */}
-      <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
           <TableSkeleton theads={[
             "Requester", "Recipient", "Blood", "Location", "Date", "Status",
@@ -225,52 +229,80 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                       )}
 
                       {/* Actions */}
-                      <td className="px-5 py-4">
-                        <div className="flex gap-1.5 flex-wrap">
-                          {req.status === "pending" && (
-                            <Button size="sm" color="primary" variant="flat"
-                              className="h-7 px-3 text-xs font-semibold rounded-lg"
-                              onPress={() => changeStatus(req._id, "inprogress")}>
-                              In Progress
+                      <td className="px-5 py-4 text-right">
+                        <Dropdown placement="bottom-end" className="bg-white border border-border z-50">
+                          <DropdownTrigger>
+                            <Button isIconOnly size="sm" variant="light" className="text-ash hover:text-charcoal rounded-lg">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="1.5" />
+                                <circle cx="12" cy="12" r="1.5" />
+                                <circle cx="12" cy="19" r="1.5" />
+                              </svg>
                             </Button>
-                          )}
-                          {req.status === "inprogress" && (
-                            <>
-                              <Button size="sm" color="success" variant="flat"
-                                className="h-7 px-3 text-xs font-semibold rounded-lg"
-                                onPress={() => changeStatus(req._id, "done")}>
-                                Done
-                              </Button>
-                              <Button size="sm" color="danger" variant="flat"
-                                className="h-7 px-3 text-xs font-semibold rounded-lg"
-                                onPress={() => changeStatus(req._id, "canceled")}>
-                                Cancel
-                              </Button>
-                            </>
-                          )}
+                          </DropdownTrigger>
+                          <DropdownMenu aria-label="Request actions" itemClasses={{ title: "text-xs font-medium text-charcoal" }}>
 
-                          <Link href={`/donation-requests/${req._id}`}>
-                            <Button size="sm" variant="light"
-                              className="h-7 px-3 text-xs text-wine font-semibold rounded-lg">
-                              View
-                            </Button>
-                          </Link>
+                            {/* View Details (Available to Everyone) */}
+                            <DropdownItem key="view" href={`/donation-requests/${req._id}`}>
+                              View Details
+                            </DropdownItem>
 
-                          {/* Admin-only: edit & delete */}
-                          {isAdmin && (
-                            <>
-                              <Button size="sm" variant="light"
-                                className="h-7 px-3 text-xs text-slate rounded-lg">
-                                Edit
-                              </Button>
-                              <Button size="sm" color="danger" variant="light"
-                                className="h-7 px-3 text-xs rounded-lg"
-                                onPress={() => { setDeleteTarget(req._id); onOpen(); }}>
-                                Delete
-                              </Button>
-                            </>
-                          )}
-                        </div>
+                            {/* Volunteer/Admin Status Updates */}
+                            {req.status === "pending" ? (
+                              <DropdownItem
+                                key="inprogress"
+                                color="primary"
+                                onPress={() => changeStatus(req._id, "inprogress")}
+                              >
+                                Mark In Progress
+                              </DropdownItem>
+                            ) : null}
+
+                            {req.status === "inprogress" ? (
+                              <DropdownItem
+                                key="done"
+                                color="success"
+                                className="text-success"
+                                onPress={() => changeStatus(req._id, "done")}
+                              >
+                                Mark Done
+                              </DropdownItem>
+                            ) : null}
+
+                            {req.status === "inprogress" ? (
+                              <DropdownItem
+                                key="cancel"
+                                color="danger"
+                                className="text-danger"
+                                onPress={() => changeStatus(req._id, "canceled")}
+                              >
+                                Cancel Request
+                              </DropdownItem>
+                            ) : null}
+
+                            {/* Admin-only destructive/management actions */}
+                            {isAdmin ? (
+                              <DropdownItem
+                                key="edit"
+                                showDivider
+                              >
+                                Edit Request
+                              </DropdownItem>
+                            ) : null}
+
+                            {isAdmin ? (
+                              <DropdownItem
+                                key="delete"
+                                color="danger"
+                                className="text-danger"
+                                onPress={() => { setDeleteTarget(req._id); onOpen(); }}
+                              >
+                                Delete Request
+                              </DropdownItem>
+                            ) : null}
+
+                          </DropdownMenu>
+                        </Dropdown>
                       </td>
                     </tr>
                   );
@@ -298,7 +330,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
             radius="lg"
             classNames={{
               wrapper: "gap-1 shadow-none",
-              item: "bg-surface hover:bg-cream text-charcoal text-xs shadow-none border border-border",
+              item: "bg-white hover:bg-cream text-charcoal text-xs shadow-none border border-border",
               cursor: "bg-wine text-white font-medium shadow-sm",
             }}
           />
