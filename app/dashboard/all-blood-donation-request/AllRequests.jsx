@@ -8,41 +8,71 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { donationRequestsAPI } from "@/lib/api";
-import { mockCurrentUser } from "@/lib/mockData";
+import { getUser } from "@/lib/api/user/user";
+import { toast } from "react-hot-toast"; // Make sure to import toast if you use it
+import { getALlRequests } from "@/lib/api/server/action";
+import TableSkeleton from "@/components/TableSkeleton";
 
 const STATUS_OPTS = ["all", "pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
-  pending:     { color: "warning", label: "Pending" },
+  pending: { color: "warning", label: "Pending" },
   inprogress: { color: "primary", label: "In Progress" },
-  done:        { color: "success", label: "Done" },
-  canceled:   { color: "danger",  label: "Canceled" },
+  done: { color: "success", label: "Done" },
+  canceled: { color: "danger", label: "Canceled" },
 };
 
 export default function AllBloodDonationRequest({ status, page, limit }) {
-  const user = mockCurrentUser;
-  const isAdmin = user.role === "admin";
-
   const router = useRouter();
   const pathname = usePathname();
 
-  const [requests, setRequests]   = useState([]);
-  const [loading, setLoading]     = useState(true);
+  const [user, setUser] = useState(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+
+  // Fetch session on mount
+  useEffect(() => {
+    const session = async () => {
+      try {
+        const res = await getUser();
+        if (res?.user) {
+          setUser(res.user);
+        }
+      } catch (err) {
+        console.error("Session fetch failed:", err);
+      } finally {
+        setSessionLoading(false);
+      }
+    };
+    session();
+  }, []);
+
+  const isAdmin = user?.role === "admin";
+  const isVolunteer = user?.role === "volunteer";
+
+  // Role authorization check
+  useEffect(() => {
+    if (sessionLoading) return; // Wait until session is verified
+
+    // Redirect if they are NEITHER an admin NOR a volunteer
+    if (!isAdmin && !isVolunteer) {
+      toast.error("You are not authorized to access this page");
+      router.push("/unauthorized");
+    }
+  }, [user, sessionLoading, isAdmin, isVolunteer, router]);
+
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
   // Delete modal (admin only)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting]         = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Sync with Server Actions / URL changes
   const load = async () => {
     setLoading(true);
     try {
-      const res = await donationRequestsAPI.getAll({
-        status: status === "all" ? undefined : status,
-        page: Number(page),
-        limit: Number(limit) || 10,
-      });
+      const res = await getALlRequests(status, Number(page), Number(limit));
       setRequests(res.requests || []);
       setTotalPages(res.totalPages || 1);
     } catch (error) {
@@ -52,18 +82,16 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
     }
   };
 
-  // Re-fetch data whenever the parent Server Component feeds updated props
   useEffect(() => {
-    load();
-  }, [status, page, limit]);
+    if (isAdmin || isVolunteer) {
+      load();
+    }
+  }, [status, page, limit, isAdmin, isVolunteer]);
 
-  // Push new query states to the URL to trigger Server Component updates
   const handleNavigate = (newStatus, newPage) => {
     const params = new URLSearchParams();
-    
     if (newStatus && newStatus !== "all") params.set("status", newStatus);
     if (newPage && Number(newPage) > 1) params.set("page", String(newPage));
-
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -79,6 +107,20 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
     setDeleting(false);
     onClose();
   };
+
+  // Prevent UI rendering while verifying initial session
+  if (sessionLoading) {
+    return (
+      <TableSkeleton theads={[
+        "Requester", "Recipient", "Blood", "Location", "Date", "Status",
+        ...(isAdmin ? ["Donor Info"] : []),
+        "Actions",
+      ]} />
+    );
+  }
+
+  // Double check authorization before layout render
+  if (!isAdmin && !isVolunteer) return null;
 
   return (
     <div className="space-y-6">
@@ -99,12 +141,11 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
         {STATUS_OPTS.map((s) => (
           <button
             key={s}
-            onClick={() => handleNavigate(s, 1)} // Resetting back to page 1 on filter switch
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${
-              status === s
-                ? "bg-wine text-white border-wine shadow-sm shadow-wine/20"
-                : "bg-surface border-border text-ash hover:text-charcoal hover:border-wine/30"
-            }`}
+            onClick={() => handleNavigate(s, 1)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${status === s
+              ? "bg-wine text-white border-wine shadow-sm shadow-wine/20"
+              : "bg-surface border-border text-ash hover:text-charcoal hover:border-wine/30"
+              }`}
           >
             {s === "all" ? "All" : s}
           </button>
@@ -114,11 +155,11 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
       {/* Table container */}
       <div className="bg-surface border border-border rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="p-8 space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-14 rounded-xl bg-cream animate-pulse" />
-            ))}
-          </div>
+          <TableSkeleton theads={[
+            "Requester", "Recipient", "Blood", "Location", "Date", "Status",
+            ...(isAdmin ? ["Donor Info"] : []),
+            "Actions",
+          ]} />
         ) : requests.length === 0 ? (
           <div className="p-12 text-center text-ash text-sm">
             No requests found for the selected filter.
@@ -240,18 +281,18 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
         )}
       </div>
 
-      {/* Styled Elegant Pagination Section */}
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between border-t border-border pt-4 px-2">
           <p className="text-xs text-ash">
             Showing page <span className="font-medium text-charcoal">{page}</span> of{" "}
             <span className="font-medium text-charcoal">{totalPages}</span>
           </p>
-          <Pagination 
-            total={totalPages} 
-            page={Number(page)} 
+          <Pagination
+            total={totalPages}
+            page={Number(page)}
             onChange={(newPage) => handleNavigate(status, newPage)}
-            color="danger" // Switched to danger/wine tones for thematic unity
+            color="danger"
             variant="faded"
             size="md"
             radius="lg"
