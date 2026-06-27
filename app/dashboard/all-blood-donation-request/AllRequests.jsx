@@ -304,8 +304,10 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                             {/* Admin-only destructive/management actions */}
                             {isAdmin ? (
                               <DropdownItem
+                              as={Link}
                                 key="edit"
                                 showDivider
+                                href={`/dashboard/all-blood-donation-request/${req._id}/edit`}
                               >
                                 Edit Request
                               </DropdownItem>
