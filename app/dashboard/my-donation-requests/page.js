@@ -8,6 +8,7 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem
 } from "@heroui/react";
 import { donationRequestsAPI } from "@/lib/api";
+import TableSkeleton from "@/components/TableSkeleton";
 
 const STATUS_OPTIONS = ["all", "pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
@@ -95,64 +96,7 @@ export default function MyDonationRequestsPage() {
       {/* Table */}
       <div className="bg-white border border-border rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-cream">
-                  {["Recipient", "Location", "Blood", "Date", "Status", "Donor Info", "Actions"].map((h) => (
-                    <th
-                      key={h}
-                      className="text-left px-5 py-3.5 text-xs font-semibold text-ash uppercase tracking-wider"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-border">
-                {[...Array(3)].map((_, i) => (
-                  <tr key={i}>
-                    {/* Recipient */}
-                    <td className="px-5 py-4">
-                      <div className="h-4 w-20 rounded bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Location */}
-                    <td className="px-5 py-4">
-                      <div className="h-4 w-32 rounded bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Blood */}
-                    <td className="px-5 py-4">
-                      <div className="h-7 w-14 rounded-lg bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Date */}
-                    <td className="px-5 py-4">
-                      <div className="h-4 w-36 rounded bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-5 py-4">
-                      <div className="h-7 w-20 rounded-full bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Donor */}
-                    <td className="px-5 py-4 space-y-2">
-                      <div className="h-4 w-28 rounded bg-cream animate-pulse" />
-                      <div className="h-3 w-40 rounded bg-cream animate-pulse" />
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-4">
-                      <div className="h-8 w-8 rounded-lg bg-cream animate-pulse" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <TableSkeleton theads={["Recipient", "Location", "Blood", "Date", "Status", "Donor Info", "Actions"]}/>
         ) : requests.length === 0 ? (
           <div className="p-12 text-center">
             <p className="text-ash text-sm mb-4">No requests found.</p>

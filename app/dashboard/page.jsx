@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 import { donationRequestsAPI, statsAPI } from "@/lib/api";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/api/user/user";
+import { getAllUsers, getUser } from "@/lib/api/user/user";
+import TableSkeleton from "@/components/TableSkeleton";
 
 const STATUS_CHIP = {
   pending: { color: "warning", label: "Pending" },
@@ -59,38 +60,47 @@ const ICON_MONEY = (
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [recentRequests, setRecentRequests] = useState([]);
+  const [loadingReqs, setLoadingReqs] = useState(true);
+  const [totalDonors, setTotalDonors] = useState(0);
+
+
+
   useEffect(() => {
     async function session() {
       const session = await getUser();
+      const totalUser = await getAllUsers({role:'donor'});
+      setTotalDonors(totalUser.total)
+
       if (session?.user) {
         setUser(session.user)
-        console.log(session.user)
       }
       else {
         redirect('/login')
       }
     }
-    
     session()
   }, [])
 
   const isAdmin = user?.role === "admin";
   const isVolunteer = user?.role === "volunteer";
 
-  const [stats, setStats] = useState(null);
-  const [recentRequests, setRecentRequests] = useState([]);
-  const [loadingReqs, setLoadingReqs] = useState(true);
+  
 
   useEffect(() => {
+    
     if (isAdmin || isVolunteer) {
       statsAPI.getDashboardStats().then(setStats);
     }
-    donationRequestsAPI
+    if (!isAdmin && !isVolunteer) {
+      donationRequestsAPI
       .getMyRequests({ limit: 3 })
       .then(({ requests }) => {
         setRecentRequests(requests);
         setLoadingReqs(false);
       });
+    }
   }, [user]);
 
   return (
@@ -124,7 +134,7 @@ export default function DashboardPage() {
       {/* Admin / Volunteer stats */}
       {(isAdmin || isVolunteer) && stats && (
         <div className="grid sm:grid-cols-3 gap-4">
-          <StatCard icon={ICON_USER} label="Total Donors" value={stats.totalUsers.toLocaleString()} sub="Registered users" color="wine" />
+          <StatCard icon={ICON_USER} label="Total Donors" value={totalDonors.toLocaleString()} sub="Registered users" color="wine" />
           <StatCard icon={ICON_MONEY} label="Total Funding" value={`৳${(stats.totalFunding / 1000).toFixed(0)}K`} sub="Community raised" color="amber" />
           <StatCard icon={ICON_DROP} label="Blood Requests" value={stats.totalRequests.toLocaleString()} sub="All time" color="blue" />
         </div>
@@ -144,58 +154,7 @@ export default function DashboardPage() {
 
           <div className="bg-white border border-border rounded-2xl overflow-hidden">
             {loadingReqs ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-cream">
-                    {["Recipient", "Location", "Blood", "Date", "Status", "Actions"].map((h) => (
-                      <th
-                        key={h}
-                        className="text-left px-5 py-3.5 text-xs font-semibold text-ash uppercase tracking-wider"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-border bg-white">
-                  {[...Array(3)].map((_, i) => (
-                    <tr key={i}>
-                      {/* Recipient */}
-                      <td className="px-5 py-4">
-                        <div className="h-4 w-20 rounded bg-cream animate-pulse" />
-                      </td>
-
-                      {/* Location */}
-                      <td className="px-5 py-4">
-                        <div className="h-4 w-32 rounded bg-cream animate-pulse" />
-                      </td>
-
-                      {/* Blood */}
-                      <td className="px-5 py-4">
-                        <div className="h-7 w-14 rounded-lg bg-cream animate-pulse" />
-                      </td>
-
-                      {/* Date */}
-                      <td className="px-5 py-4">
-                        <div className="h-4 w-36 rounded bg-cream animate-pulse" />
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-5 py-4">
-                        <div className="h-7 w-20 rounded-full bg-cream animate-pulse" />
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-5 py-4">
-                        <div className="h-8 w-8 rounded-lg bg-cream animate-pulse" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TableSkeleton theads={["Recipient", "Location", "Blood", "Date", "Status", "Actions"]}/>
           ) : recentRequests.length === 0 ? (
             <div className="bg-cream rounded-2xl p-10 text-center">
               <p className="text-ash text-sm mb-4">You haven't made any donation requests yet.</p>

@@ -1,12 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation"; // Added Next.js navigation hooks
 import {
   Button, Chip, Avatar,
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from "@heroui/react";
 import { usersAPI } from "@/lib/api";
-import { getAllUser, userUpdate } from "@/lib/api/user/user";
+import { getAllUsers, userUpdate } from "@/lib/api/user/user";
 import toast from "react-hot-toast";
+import TableSkeleton from "@/components/TableSkeleton";
+
 const STATUS_FILTER = ["all", "active", "blocked"];
 const ROLE_CHIP = {
   admin:     { color: "danger",  label: "Admin" },
@@ -15,28 +18,55 @@ const ROLE_CHIP = {
 };
 
 export default function AllUsersPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // 1. Read initial state directly from URL query param, fallback to "all"
+  const currentStatusFilter = searchParams.get("status") || "all";
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("all");
 
+  // 2. Main data-fetching logic dependent on URL parameter
   const loadUsers = async () => {
     setLoading(true);
-    const users= await getAllUser();
-    console.log(users)
-    setUsers(users);
-    setLoading(false);
+    try {
+      const options = {};
+      if (currentStatusFilter !== "all") {
+        options.status = currentStatusFilter;
+      }
+      const data = await getAllUsers(options);
+      setUsers(data.users || []);
+    } catch (error) {
+      toast.error("Failed to fetch users");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { loadUsers(); }, []);
+  // 3. Re-run fetching anytime the URL parameter changes
+  useEffect(() => {
+    loadUsers();
+  }, [currentStatusFilter]);
+
+  // 4. Update URL when a filter button is clicked
+  const handleFilterChange = (status) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status === "all") {
+      params.delete("status"); // Keep clean URLs for default state
+    } else {
+      params.set("status", status);
+    }
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const handleRoleChange = async (userId, role) => {
     const data = await userUpdate(userId, {role}, 'updateRole')
-    console.log(data)
-    if (data.message.user.id) {
+    if (data.message.user?.id) {
       setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role } : u));
       toast.success(`${data.message.user.name} is now ${data.message.user.role}`)
-    }
-    if(!data.message.user.id){
+    } else {
       toast.error("Something went wrong. Please try again later")
     }
   };
@@ -44,14 +74,17 @@ export default function AllUsersPage() {
   const handleStatusToggle = async (userId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "blocked" : "active";
     const data = await userUpdate(userId, {status: newStatus}, 'updateStatus')
-    if (data.message.id) {
-      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
+    if (data.message?.id) {
+      // If the current view is filtering by a status, remove the user from the list upon changing it
+      if (currentStatusFilter !== "all" && currentStatusFilter !== newStatus) {
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+      } else {
+        setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
+      }
       toast.success(`${data.message.name} is now ${data.message.status}`)
-    }
-    if(!data.message.id){
+    } else {
       toast.error("Something went wrong. Please try again later")
     }
-    // 
   };
 
   return (
@@ -61,14 +94,14 @@ export default function AllUsersPage() {
         <p className="text-sm text-ash mt-1">Manage donor accounts, roles, and access</p>
       </div>
 
-      {/* Filter */}
+      {/* Filter Buttons */}
       <div className="flex gap-2">
         {STATUS_FILTER.map((s) => (
           <button
             key={s}
-            onClick={() => setStatusFilter(s)}
+            onClick={() => handleFilterChange(s)} // Triggers URL update instead of local state
             className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${
-              statusFilter === s
+              currentStatusFilter === s
                 ? "bg-wine text-white border-wine"
                 : "bg-white border-border text-ash hover:text-charcoal"
             }`}
@@ -80,14 +113,7 @@ export default function AllUsersPage() {
 
       <div className="bg-white border border-border rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="p-8 space-y-4">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-cream animate-pulse" />
-                <div className="flex-1 h-6 rounded-lg bg-cream animate-pulse" />
-              </div>
-            ))}
-          </div>
+          <TableSkeleton theads={["User", "Blood Group", "Role", "Status", "Actions"]}/>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -105,7 +131,6 @@ export default function AllUsersPage() {
                   const roleCfg = ROLE_CHIP[u.role] || { color: "default", label: u.role };
                   return (
                     <tr key={u.id} className="hover:bg-cream/40 transition-colors">
-                      {/* User info */}
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <Avatar src={u.avatar} name={u.name} size="sm" />
@@ -116,21 +141,18 @@ export default function AllUsersPage() {
                         </div>
                       </td>
 
-                      {/* Blood */}
                       <td className="px-5 py-4">
                         <span className="font-mono font-semibold text-wine text-xs bg-wine/8 px-2 py-1 rounded-lg">
                           {u.bloodGroup}
                         </span>
                       </td>
 
-                      {/* Role */}
                       <td className="px-5 py-4">
                         <Chip size="sm" color={roleCfg.color} variant="flat" className="text-xs capitalize">
                           {roleCfg.label}
                         </Chip>
                       </td>
 
-                      {/* Status */}
                       <td className="px-5 py-4">
                         <Chip
                           size="sm"
@@ -142,7 +164,6 @@ export default function AllUsersPage() {
                         </Chip>
                       </td>
 
-                      {/* Actions — three-dot dropdown */}
                       <td className="px-5 py-4">
                         <Dropdown placement="bottom-end">
                           <DropdownTrigger>
@@ -163,7 +184,8 @@ export default function AllUsersPage() {
                                 onPress={() => handleStatusToggle(u.id, u.status)}>
                                 Unblock User
                               </DropdownItem>
-                            )}
+                            )
+                            }
                             {u.role !== "volunteer" && (
                               <DropdownItem key="volunteer"
                                 onPress={() => handleRoleChange(u.id, "volunteer")}>
