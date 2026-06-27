@@ -9,8 +9,6 @@ import {
 } from "@heroui/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { donationRequestsAPI } from "@/lib/api";
-import { mockCurrentUser } from "@/lib/mockData";
 import { getUser } from "@/lib/api/user/user";
 import { getRequestById } from "@/lib/api/server/action";
 import { updateRequest } from "@/lib/api/server/mutation";
@@ -199,7 +197,7 @@ export default function RequestDetailPage() {
 
               {/* Message */}
               <div className="bg-surface border border-border rounded-2xl p-7">
-                <h2 className="font-semibold text-charcoal mb-3 text-sm uppercase tracking-wider text-ash">
+                <h2 className="font-semibold text-charcoal mb-3 text-sm uppercase tracking-wider">
                   Why Blood is Needed
                 </h2>
                 <p className="text-base text-slate leading-relaxed">{req.requestMessage}</p>

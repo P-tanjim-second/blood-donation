@@ -12,6 +12,8 @@ import { donationRequestsAPI } from "@/lib/api";
 import TableSkeleton from "@/components/TableSkeleton";
 import { getUser } from "@/lib/api/user/user";
 import { getMyDonationRequests } from "@/lib/api/server/action";
+import { updateRequest } from "@/lib/api/server/mutation";
+import toast from "react-hot-toast";
 
 const STATUS_OPTIONS = ["all", "pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
@@ -104,7 +106,13 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
   };
 
   const handleStatusChange = async (reqId, newStatus) => {
-    await donationRequestsAPI.updateStatus(reqId, newStatus);
+    const res = await updateRequest(reqId, {status: newStatus});
+    if(res.status == 200){
+        toast.success("Status updated successfully!");
+    }
+    else{
+        toast.error("Failed to update status!");
+    }
     setRequests((prev) =>
       prev.map((r) => r._id === reqId ? { ...r, status: newStatus } : r)
     );
@@ -112,7 +120,13 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
 
   const confirmDelete = async () => {
     setDeleting(true);
-    await donationRequestsAPI.delete(deleteTarget);
+    const res = await updateRequest(deleteTarget, {status: "canceled"}, "DELETE");
+    if(res.status == 200){
+        toast.success("Status updated successfully!");
+    }
+    else{
+        toast.error("Failed to update status!");
+    }
     setRequests((prev) => prev.filter((r) => r._id !== deleteTarget));
     setDeleting(false);
     onDeleteClose();
