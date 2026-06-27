@@ -2,21 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
-// import { donationRequestsAPI } from "@/lib/api";
+import { getAllRequests } from "@/lib/api/server/action";
 
-const donationRequestsAPI = {
-  getPending: async () => {
-    // Mock data for now
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return {
-      requests: [
-        { _id: "1", recipientName: "Karim Ahmed", bloodGroup: "A+", recipientDistrict: "Dhaka", recipientUpazila: "Dhaka", hospitalName: "Dhaka Medical College Hospital", donationDate: "2023-05-20", donationTime: "10:00 AM", requestMessage: "Karim needs A+ blood urgently!" },
-        { _id: "2", recipientName: "Rahima Begum", bloodGroup: "B-", recipientDistrict: "Chittagong", recipientUpazila: "Chattogram", hospitalName: "Chittagong General Hospital", donationDate: "2023-05-21", donationTime: "11:00 AM", requestMessage: "Rahima needs B- blood urgently!" },
-        { _id: "3", recipientName: "John Doe", bloodGroup: "AB+", recipientDistrict: "Rajshahi", recipientUpazila: "Rajshahi", hospitalName: "Rajshahi Medical College Hospital", donationDate: "2023-05-22", donationTime: "12:00 PM", requestMessage: "John needs AB+ blood urgently!" },
-      ],
-    };
-  },
-};
 
 
 const BG_COLORS = {
@@ -31,6 +18,7 @@ const BG_COLORS = {
 };
 
 function RequestCard({ req, index }) {
+
   return (
     <div
       className="reveal hover-lift bg-white rounded-2xl border border-border p-6 flex flex-col gap-4"
@@ -108,11 +96,12 @@ export default function UrgentRequestsSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Replace with real API call when backend is ready
-    donationRequestsAPI.getPending().then(({ requests }) => {
-      setRequests(requests.slice(0, 3));
+    const func = async () => {
+      const requests = await getAllRequests("pending", 1, 3);
+      setRequests(requests.requests);
       setLoading(false);
-    });
+    }
+    func();
   }, []);
 
   useEffect(() => {
