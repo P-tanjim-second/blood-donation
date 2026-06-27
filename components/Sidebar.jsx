@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import { Avatar, Button, Chip } from "@heroui/react";
 import { getUser } from "@/lib/api/user/user";
+import { signOut } from "@/lib/auth-client";
 
 // Icons (inline SVG for zero-dep) 
 const Icon = ({ d, size = 18 }) => (

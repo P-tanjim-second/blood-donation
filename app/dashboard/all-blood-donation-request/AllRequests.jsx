@@ -15,6 +15,7 @@ import { getUser } from "@/lib/api/user/user";
 import { toast } from "react-hot-toast"; // Make sure to import toast if you use it
 import { getAllRequests } from "@/lib/api/server/action";
 import TableSkeleton from "@/components/TableSkeleton";
+import { updateRequest } from "@/lib/api/server/mutation";
 
 const STATUS_OPTS = ["all", "pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
@@ -100,13 +101,36 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
   };
 
   const changeStatus = async (id, updatedStatus) => {
-    await donationRequestsAPI.updateStatus(id, updatedStatus);
-    setRequests((prev) => prev.map((r) => r._id === id ? { ...r, status: updatedStatus } : r));
+    if (updatedStatus === "inprogress") {
+      const res = await updateRequest(id, { status: updatedStatus, donorName: user.name, donorEmail: user.email });
+      if (res.status === 200) {
+        toast.success("Request accepted successfully!");
+        setRequests((prev) => prev.map((r) => r._id === id ? { ...r, status: updatedStatus, donorName: user.name, donorEmail: user.email } : r));
+      }
+      else {
+        toast.error("Failed to accept request!");
+      }
+    } else {
+      const res = await updateRequest(id, { status: updatedStatus });
+      if (res.status === 200) {
+        toast.success("Request updated successfully!");
+        setRequests((prev) => prev.map((r) => r._id === id ? { ...r, status: updatedStatus } : r));
+      }
+      else {
+        toast.error("Failed to update request!");
+      }
+    }
   };
 
   const confirmDelete = async () => {
     setDeleting(true);
-    await donationRequestsAPI.delete(deleteTarget);
+    const res = await updateRequest(deleteTarget, {}, "DELETE");
+    if (res.status === 200) {
+      toast.success("Request deleted successfully!");
+    }
+    else {
+      toast.error("Failed to delete request!");
+    }
     setRequests((prev) => prev.filter((r) => r._id !== deleteTarget));
     setDeleting(false);
     onClose();
@@ -117,7 +141,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
     return (
       <TableSkeleton theads={[
         "Requester", "Recipient", "Blood", "Location", "Date", "Status",
-        ...(isAdmin ? ["Donor Info"] : []),
+        "Donor Info",
         "Actions",
       ]} />
     );
@@ -161,7 +185,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
         {loading ? (
           <TableSkeleton theads={[
             "Requester", "Recipient", "Blood", "Location", "Date", "Status",
-            ...(isAdmin ? ["Donor Info"] : []),
+            "Donor Info",
             "Actions",
           ]} />
         ) : requests.length === 0 ? (
@@ -175,7 +199,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                 <tr className="border-b border-border bg-cream/50">
                   {[
                     "Requester", "Recipient", "Blood", "Location", "Date", "Status",
-                    ...(isAdmin ? ["Donor Info"] : []),
+                    "Donor Info",
                     "Actions",
                   ].map((h) => (
                     <th key={h}
@@ -214,19 +238,16 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                         </Chip>
                       </td>
 
-                      {/* Donor info (admin only) */}
-                      {isAdmin && (
-                        <td className="px-5 py-4">
-                          {req.status === "inprogress" && req.donorName ? (
-                            <div className="text-xs">
-                              <p className="font-medium text-charcoal">{req.donorName}</p>
-                              <p className="text-ash">{req.donorEmail}</p>
-                            </div>
-                          ) : (
-                            <span className="text-ash text-xs">—</span>
-                          )}
-                        </td>
-                      )}
+                      <td className="px-5 py-4">
+                        {req.status === "inprogress" || req.donorName ? (
+                          <div className="text-xs">
+                            <p className="font-medium text-charcoal">{req.donorName}</p>
+                            <p className="text-ash">{req.donorEmail}</p>
+                          </div>
+                        ) : (
+                          <span className="text-ash text-xs">—</span>
+                        )}
+                      </td>
 
                       {/* Actions */}
                       <td className="px-5 py-4 text-right">
