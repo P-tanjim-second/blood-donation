@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
 
   useEffect(() => {
-    if (!isAdmin && !isVolunteer) {
+    if (!isAdmin && !isVolunteer && user?.role == 'donor') {
 
       async function getRecentRequests() {
         const { requests } = await getMyDonationRequests(user?.email, { limit: 3 });
