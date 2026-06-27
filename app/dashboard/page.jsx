@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
 import { dashboardData, getAllRequests, getMyDonationRequests, getUsersCount } from "@/lib/api/server/action";
+import { serverFetch } from "@/lib/api/core/core";
 
 const STATUS_CHIP = {
   pending: { color: "warning", label: "Pending" },
@@ -75,11 +76,13 @@ export default function DashboardPage() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
-        if (isAdmin || isVolunteer) {
-          const data = await dashboardData();
-          setTotalDonors(parseInt(data[0].total));
-          setTotalRequests(parseInt(data[1].total));
-          setTotalFunding(parseInt(data[2].funding));
+        if (session?.user?.role === "admin" || session?.user?.role === "volunteer") {
+          const totalDonors = await getUsersCount('donor');
+          setTotalDonors(parseInt(totalDonors.total));
+          const totalRequests = await getAllRequests("all", 1, "all");
+          setTotalRequests(parseInt(totalRequests.total));
+          const totalFunding = await serverFetch(`/total_funding`);
+          setTotalFunding(parseInt(totalFunding.funding));
         }
       }
       else {
