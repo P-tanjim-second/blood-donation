@@ -21,18 +21,10 @@ export default function RegisterFormPage({redirectTo}) {
 
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
 
-  // TODO: replace with real imageBB upload
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-
-    // Preview
-    // const reader = new FileReader();
-    // reader.onload = (ev) => setAvatarPreview(ev.target.result);
-    // reader.readAsDataURL(file);
-
-    // Upload to imageBB
     try {
       const data = new FormData();
       data.append("image", file);
@@ -62,7 +54,6 @@ export default function RegisterFormPage({redirectTo}) {
       return;
     }
     setLoading(true);
-    console.log(form)
     const user = {
       name: form.name,
       email: form.email,
@@ -71,12 +62,12 @@ export default function RegisterFormPage({redirectTo}) {
       district: form.district,
       upazila: form.upazila,
       bloodGroup: form.bloodGroup,
-      role: 'donor',
-      status: 'active'
+      role: "donor",
+      status: "active"
     }
     try {
+      console.log(user)
       const {data, error} = await signUp.email(user);
-      console.log(data)
       if (data) {
         toast.success("Registration successfull.")
         router.push(redirectTo);

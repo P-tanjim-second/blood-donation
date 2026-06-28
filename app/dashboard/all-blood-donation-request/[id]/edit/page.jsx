@@ -7,6 +7,8 @@ import { donationRequestsAPI } from "@/lib/api";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { getUser } from "@/lib/api/user/user";
 import { getRequestById } from "@/lib/api/server/action";
+import { updateRequest } from "@/lib/api/server/mutation";
+import toast from "react-hot-toast";
 
 const STATUS_OPTS = ["pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
@@ -100,9 +102,14 @@ export default function AdminEditRequestPage() {
         e.preventDefault();
         setSaving(true);
         try {
-            await donationRequestsAPI.update(id, form);
-            setSuccess(true);
-            setTimeout(() => router.push("/dashboard/all-blood-donation-request"), 2000);
+            const res = await updateRequest(id, form);
+            if (res.status === 200) {
+                setSuccess(true);
+                toast.success("Request updated successfully");
+                setTimeout(() => router.push("/dashboard/all-blood-donation-request"), 1000);
+            } else {
+                toast.error("Failed to update request");
+            }
         } catch {
             setSaving(false);
         }
@@ -217,11 +224,10 @@ export default function AdminEditRequestPage() {
                                         key={s}
                                         type="button"
                                         onClick={() => update("status", s)}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium capitalize transition-all duration-200 ${
-                                            isActive
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium capitalize transition-all duration-200 ${isActive
                                                 ? "bg-wine text-white border-wine shadow-wine-sm"
                                                 : "border-border text-ash bg-surface hover:border-wine/30 hover:text-charcoal"
-                                        }`}
+                                            }`}
                                     >
                                         {isActive && (
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
