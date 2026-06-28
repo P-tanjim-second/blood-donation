@@ -1,10 +1,13 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import HeroSection from "@/components/sections/HeroSection";
-import StatsSection from "@/components/sections/StatsSection";
-import FeaturesSection from "@/components/sections/FeaturesSection";
-import UrgentRequestsSection from "@/components/sections/UrgentRequestsSection";
-import { SearchCTASection, ContactSection } from "@/components/sections/ContactSection";
+import dynamic from "next/dynamic";
+
+const DynamicHeroSection = dynamic(() => import("@/components/sections/HeroSection"));
+const DynamicStatsSection = dynamic(() => import("@/components/sections/StatsSection"));
+const DynamicFeaturesSection = dynamic(() => import("@/components/sections/FeaturesSection"));
+const DynamicUrgentRequestsSection = dynamic(() => import("@/components/sections/UrgentRequestsSection"));
+const DynamicSearchCTASection = dynamic(() => import("@/components/sections/ContactSection").then(mod => mod.SearchCTASection));
+const DynamicContactSection = dynamic(() => import("@/components/sections/ContactSection").then(mod => mod.ContactSection));
 
 export const metadata = {
   title: "Vitae - Give Life, Save Stories",
@@ -16,12 +19,12 @@ export default function HomePage() {
     <>
       <Navbar />
       <main>
-        <HeroSection />
-        <StatsSection />
-        <FeaturesSection />
-        <UrgentRequestsSection />
-        <SearchCTASection />
-        <ContactSection />
+        <DynamicHeroSection />
+        <DynamicStatsSection />
+        <DynamicFeaturesSection />
+        <DynamicUrgentRequestsSection />
+        <DynamicSearchCTASection />
+        <DynamicContactSection />
       </main>
       <Footer />
     </>
