@@ -6,7 +6,7 @@ import { Button, Chip } from "@heroui/react";
 import { redirect } from "next/navigation";
 import { getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
-import { dashboardData, getAllRequests, getMyDonationRequests, getUsersCount } from "@/lib/api/server/action";
+import { dashboardData, getAllRequests, getMyDonationRequests, getTotalFunding, getUsersCount } from "@/lib/api/server/action";
 import { serverFetch } from "@/lib/api/core/core";
 
 const STATUS_CHIP = {
@@ -81,7 +81,7 @@ export default function DashboardPage() {
           setTotalDonors(parseInt(totalDonors.total));
           const totalRequests = await getAllRequests("all", 1, "all");
           setTotalRequests(parseInt(totalRequests.total));
-          const totalFunding = await serverFetch(`/total_funding`);
+          const totalFunding = await getTotalFunding();
           setTotalFunding(parseInt(totalFunding.funding));
         }
       }
