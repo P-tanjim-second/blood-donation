@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Chip } from "@heroui/react";
-import { donationRequestsAPI } from "@/lib/api";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { getUser } from "@/lib/api/user/user";
 import { getRequestById } from "@/lib/api/server/action";
 import { updateRequest } from "@/lib/api/server/mutation";
 import toast from "react-hot-toast";
+import { CustomSelect } from "@/components/CustomSelect";
 
 const STATUS_OPTS = ["pending", "inprogress", "done", "canceled"];
 const STATUS_CHIP = {
@@ -46,7 +46,6 @@ export default function AdminEditRequestPage() {
     useEffect(() => {
         async function checkAuthAndFetchData() {
             try {
-                // 1. Authenticate user session
                 const session = await getUser();
 
                 if (!session || !session.user) {
@@ -54,17 +53,14 @@ export default function AdminEditRequestPage() {
                     return;
                 }
 
-                // 2. Validate authorized role (fixed precedence bug)
                 const role = session.user.role;
                 if (role !== "admin") {
                     router.replace("/dashboard");
                     return;
                 }
 
-                // 3. Prevent fetching data if route params are not ready yet
                 if (!id) return;
 
-                // 4. Fetch data ONLY after auth passes successfully
                 const { request, status } = await getRequestById(id);
                 if (status === 200 && request) {
                     setForm({
@@ -129,7 +125,7 @@ export default function AdminEditRequestPage() {
         return (
             <div className="max-w-2xl space-y-6">
                 <div className="h-10 w-64 rounded-xl bg-parchment animate-pulse" />
-                <div className="bg-surface border border-border rounded-2xl p-7 space-y-5">
+                <div className="bg-white border border-border rounded-2xl p-7 space-y-5">
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                         <div key={i} className="h-12 rounded-xl bg-cream animate-pulse" />
                     ))}
@@ -204,7 +200,7 @@ export default function AdminEditRequestPage() {
                 </p>
             </div>
 
-            <div className="bg-surface border border-border rounded-2xl p-7">
+            <div className="bg-white border border-border rounded-2xl p-7">
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid sm:grid-cols-2 gap-4 pb-5 border-b border-border">
                         <Field label="Requester Name">
@@ -225,8 +221,8 @@ export default function AdminEditRequestPage() {
                                         type="button"
                                         onClick={() => update("status", s)}
                                         className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium capitalize transition-all duration-200 ${isActive
-                                                ? "bg-wine text-white border-wine shadow-wine-sm"
-                                                : "border-border text-ash bg-surface hover:border-wine/30 hover:text-charcoal"
+                                            ? "bg-wine text-white border-wine shadow-wine-sm"
+                                            : "border-border text-ash bg-white hover:border-wine/30 hover:text-charcoal"
                                             }`}
                                     >
                                         {isActive && (
@@ -259,33 +255,23 @@ export default function AdminEditRequestPage() {
 
                     <div className="grid sm:grid-cols-2 gap-4">
                         <Field label="Recipient District" required>
-                            <select
-                                required
-                                className="form-input"
+                            <CustomSelect
+                                options={DISTRICTS}
                                 value={form.recipientDistrict}
-                                onChange={(e) => {
-                                    update("recipientDistrict", e.target.value);
+                                placeholder={"Select District"}
+                                onChange={(val) => {
+                                    update("recipientDistrict", val);
                                     update("recipientUpazila", "");
                                 }}
-                            >
-                                <option value="">Select district</option>
-                                {DISTRICTS.map((d) => (
-                                    <option key={d} value={d}>{d}</option>
-                                ))}
-                            </select>
+                            />
                         </Field>
                         <Field label="Recipient Upazila" required>
-                            <select
-                                required
-                                className="form-input"
+                            <CustomSelect
+                                options={upazilas}
                                 value={form.recipientUpazila}
-                                onChange={(e) => update("recipientUpazila", e.target.value)}
-                            >
-                                <option value="">Select upazila</option>
-                                {upazilas.map((u) => (
-                                    <option key={u} value={u}>{u}</option>
-                                ))}
-                            </select>
+                                placeholder={"Select Upazila"}
+                                onChange={(val) => update("recipientUpazila", val)}
+                            />
                         </Field>
                     </div>
 
@@ -311,12 +297,11 @@ export default function AdminEditRequestPage() {
 
                     <div className="grid sm:grid-cols-3 gap-4">
                         <Field label="Blood Group" required>
-                            <select required className="form-input" value={form.bloodGroup} onChange={(e) => update("bloodGroup", e.target.value)}>
-                                <option value="">Select</option>
-                                {BLOOD_GROUPS.map((g) => (
-                                    <option key={g} value={g}>{g}</option>
-                                ))}
-                            </select>
+                            <CustomSelect
+                                options={BLOOD_GROUPS}
+                                value={form.bloodGroup}
+                                placeholder={"Select Blood Group"}
+                                onChange={(val) => update("bloodGroup", val)} />
                         </Field>
                         <Field label="Donation Date" required>
                             <input
