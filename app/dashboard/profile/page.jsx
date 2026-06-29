@@ -1,13 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button, Avatar } from "@heroui/react";
-import { usersAPI } from "@/lib/api";
-import { mockCurrentUser, BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
+import { Button, Avatar } from "@heroui/react"; // Cleaned up lowercase 'avatar' import
+import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { getUser, userUpdate } from "@/lib/api/user/user";
 import { CustomSelect } from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 
-// 1. ✅ FIXED: Moved Field component outside to prevent input elements from remounting on keystroke
 const Field = ({ label, children }) => (
   <div>
     <label className="form-label">{label}</label>
@@ -21,8 +19,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // 2. ✅ FIXED: Initialize cleanly to avoid controlled/uncontrolled errors
   const [form, setForm] = useState({
+    id: "", // Ensure ID tracking exists
     name: "",
     avatar: "",
     bloodGroup: "",
@@ -34,8 +32,13 @@ export default function ProfilePage() {
     async function session() {
       const session = await getUser();
       if (session?.user) {
-        setUser(session.user);
-        setForm(session.user);
+        // Ensure we capture whatever identifier your DB uses (id or _id)
+        const userData = {
+          ...session.user,
+          id: session.user.id || session.user._id || "", 
+        };
+        setUser(userData);
+        setForm(userData);
       }
     }
     session();
@@ -44,27 +47,50 @@ export default function ProfilePage() {
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  const handleSave = async (e, form) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
+    
     const updateData = {
       name: form.name,
       bloodGroup: form.bloodGroup,
       district: form.district,
       upazila: form.upazila,
+    };
+
+    // Double check if form.id or form._id is what your backend expects
+    const targetId = form.id || form._id; 
+
+    try {
+      const data = await userUpdate(targetId, updateData, "updateProfile");
+      
+      // Check for structural matching from your API response
+      if (data?.user?.modifiedCount === 1 || data?.modifiedCount === 1 || data?.success) {
+        toast.success("Profile updated successfully!");
+        
+        const updatedUser = { 
+          ...user, 
+          ...updateData 
+        };
+        
+        setUser(updatedUser);
+        setForm(updatedUser); // Preserves ID and other omitted fields
+        setSaved(true);
+        setEditing(false);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        toast.error("No changes made or user not found.");
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again later.");
+    } finally {
+      setSaving(false);
     }
-    const data = await userUpdate(form.id, updateData, "updateProfile");
-    if (data?.matchedCount == 1) {
-      toast.success("Profile updated successfully!");
-      setForm(prev => ({ ...prev, ...updateData }))
-    }
-    if (data?.matchedCount != 1) {
-      toast.error("Something went wrong. Please try again later.")
-    }
-    setSaving(false);
+  };
+
+  const handleCancel = () => {
+    setForm(user); // Reset form back to the last saved database state
     setEditing(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
   };
 
   return (
@@ -93,7 +119,7 @@ export default function ProfilePage() {
       )}
 
       {/* Avatar section */}
-      <div className={`bg-white border border-border rounded-2xl p-6 flex items-center gap-6`}>
+      <div className="bg-white border border-border rounded-2xl p-6 flex items-center gap-6">
         <Avatar
           src={form.avatar}
           name={form.name}
@@ -121,9 +147,8 @@ export default function ProfilePage() {
 
       {/* Form */}
       <div className={`bg-white border ${editing ? "border-black/20" : "border-border"} rounded-2xl p-6`}>
-        <form onSubmit={(e) => handleSave(e, form)} className="space-y-5">
+        <form onSubmit={handleSave} className="space-y-5">
           <Field label="Full Name">
-            {/* 3. ✅ FIXED: Changed defaultValue to value, bound onChange, added conditional string fallback */}
             <input
               className="form-input"
               value={form.name || ""}
@@ -191,7 +216,7 @@ export default function ProfilePage() {
                 type="button"
                 variant="bordered"
                 className="border-border text-slate rounded-xl"
-                onPress={() => setEditing(false)}
+                onPress={handleCancel}
               >
                 Cancel
               </Button>
