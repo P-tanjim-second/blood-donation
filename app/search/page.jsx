@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { Button, Avatar, Select, SelectItem } from "@heroui/react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { Button, Avatar } from "@heroui/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
@@ -54,6 +54,9 @@ function DonorCard({ donor }) {
 
 function SearchContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [form, setForm] = useState({
     bloodGroup: searchParams.get("bloodGroup") || "",
     district: searchParams.get("district") || "",
@@ -66,44 +69,55 @@ function SearchContent() {
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
-  // Auto-search if URL has params
-  useEffect(() => {
-    if (searchParams.get("bloodGroup") || searchParams.get("district")) {
-      handleSearch();
-    }
-  }, []);
-
-  const handleSearch = async (e) => {
-    e?.preventDefault();
+  const fetchDonors = async (filters) => {
     setLoading(true);
     try {
-      if (!form.bloodGroup && !form.district && !form.upazila) {
-        toast.error("Please select at least one field");
-        return;
-      }
-
-      const response = await getAllDonors(form);
-
+      const response = await getAllDonors(filters);
       const donors = response?.donors || [];
       setResults(donors);
     } catch (error) {
       console.error("Search page: donor fetch failed", error);
-      toast.error("Something wrong during fetching donors");
+      toast.error("Something went wrong while fetching donors");
     } finally {
       setSearched(true);
       setLoading(false);
     }
   };
 
-  // PDF download (optional feature)
+  useEffect(() => {
+    const bg = searchParams.get("bloodGroup") || "";
+    const dist = searchParams.get("district") || "";
+    const upz = searchParams.get("upazila") || "";
+
+    setForm({ bloodGroup: bg, district: dist, upazila: upz });
+
+    if (bg || dist || upz) {
+      fetchDonors({ bloodGroup: bg, district: dist, upazila: upz });
+    }
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    e?.preventDefault();
+
+    if (!form.bloodGroup && !form.district && !form.upazila) {
+      toast.error("Please select at least one field");
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (form.bloodGroup) params.set("bloodGroup", form.bloodGroup);
+    if (form.district) params.set("district", form.district);
+    if (form.upazila) params.set("upazila", form.upazila);
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
   const downloadPDF = () => {
-    // TODO: implement PDF export of search results
     window.print();
   };
 
   return (
     <>
-      {/* Search form */}
       <div className="bg-cream border-b border-border py-10">
         <div className="max-w-8xl mx-auto px-5 lg:px-10">
           <p className="eyebrow mb-3">Donor Search</p>
