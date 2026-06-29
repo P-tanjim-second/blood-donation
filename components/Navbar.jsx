@@ -124,7 +124,7 @@ export default function Navbar() {
                         <p className="text-xs font-semibold text-charcoal leading-tight">
                           {user.name}
                         </p>
-                        <p className="text-[11px] text-ash capitalize">{user.role}</p>
+                        <p className="text-[11px] text-ash capitalize">{user.userRole}</p>
                       </div>
                     </button>
                   </DropdownTrigger>
@@ -214,7 +214,7 @@ export default function Navbar() {
                     <Avatar src={user.avatar} name={user.name} size="sm" />
                     <div>
                       <p className="text-sm font-semibold text-charcoal">{user.name}</p>
-                      <p className="text-xs text-ash capitalize">{user.role}</p>
+                      <p className="text-xs text-ash capitalize">{user.userRole}</p>
                     </div>
                   </div>
                   <Link href="/dashboard" onClick={() => setMenuOpen(false)}>

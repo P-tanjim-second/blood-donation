@@ -96,13 +96,13 @@ export default function Forbidden() {
                      divide-y divide-border overflow-hidden hero-enter hero-enter-4"
         >
           {[
-            { role: "Admin", access: "Full platform access", color: "text-rose-600  bg-rose-50" },
-            { role: "Volunteer", access: "Manage donation requests", color: "text-amber-600 bg-amber-50" },
-            { role: "Donor", access: "Create & manage your requests", color: "text-blue-600  bg-blue-50" },
-          ].map(({ role, access, color }) => (
-            <div key={role} className="flex items-center justify-between px-5 py-3.5 gap-4">
+            { userRole: "Admin", access: "Full platform access", color: "text-rose-600  bg-rose-50" },
+            { userRole: "Volunteer", access: "Manage donation requests", color: "text-amber-600 bg-amber-50" },
+            { userRole: "Donor", access: "Create & manage your requests", color: "text-blue-600  bg-blue-50" },
+          ].map(({ userRole, access, color }) => (
+            <div key={userRole} className="flex items-center justify-between px-5 py-3.5 gap-4">
               <span className={`text-xs font-mono font-bold px-2.5 py-1 rounded-lg shrink-0 ${color}`}>
-                {role}
+                {userRole}
               </span>
               <span className="text-xs text-ash text-right">{access}</span>
             </div>

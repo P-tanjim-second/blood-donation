@@ -49,8 +49,8 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
     session();
   }, []);
 
-  const isAdmin = user?.role === "admin";
-  const isVolunteer = user?.role === "volunteer";
+  const isAdmin = user?.userRole === "admin";
+  const isVolunteer = user?.userRole === "volunteer";
 
   // Role authorization check
   useEffect(() => {
@@ -239,7 +239,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                       </td>
 
                       <td className="px-5 py-4">
-                        {req.status === "inprogress" || req.donorName ? (
+                        {req.donorName ? (
                           <div className="text-xs">
                             <p className="font-medium text-charcoal">{req.donorName}</p>
                             <p className="text-ash">{req.donorEmail}</p>
@@ -304,7 +304,7 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
                             {/* Admin-only destructive/management actions */}
                             {isAdmin ? (
                               <DropdownItem
-                              as={Link}
+                                as={Link}
                                 key="edit"
                                 showDivider
                                 href={`/dashboard/all-blood-donation-request/${req._id}/edit`}

@@ -205,7 +205,7 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
                         <Chip size="sm" color={st.color} variant="flat" className="text-xs">{st.label}</Chip>
                       </td>
                       <td className="px-5 py-4">
-                        {req.status === "inprogress" && req.donorName ? (
+                        {req.donorName ? (
                           <div className="text-xs">
                             <p className="font-medium text-charcoal">{req.donorName}</p>
                             <p className="text-ash">{req.donorEmail}</p>

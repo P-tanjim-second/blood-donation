@@ -8,7 +8,7 @@ import { CustomSelect } from "@/components/CustomSelect";
 import { signUp } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
-export default function RegisterFormPage({redirectTo}) {
+export default function RegisterFormPage({ redirectTo }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -62,12 +62,12 @@ export default function RegisterFormPage({redirectTo}) {
       district: form.district,
       upazila: form.upazila,
       bloodGroup: form.bloodGroup,
-      role: "donor",
-      status: "active"
+      userRole: "donor",
+      status: "active",
+      lastDonated: "N/A"
     }
     try {
-      console.log(user)
-      const {data, error} = await signUp.email(user);
+      const { data, error } = await signUp.email(user);
       if (data) {
         toast.success("Registration successfull.")
         router.push(redirectTo);
@@ -78,7 +78,7 @@ export default function RegisterFormPage({redirectTo}) {
     } catch (error) {
       toast.error(error.message)
       setError("Registration failed. Please try again.");
-      
+
     } finally {
       setLoading(false);
     }
@@ -246,7 +246,7 @@ export default function RegisterFormPage({redirectTo}) {
 
           <p className="text-center text-sm text-ash mt-5">
             Already have an account?{" "}
-            <Link href={`/login${redirectTo == '/' ? '': '?redirect=' + redirectTo}`} className="text-wine font-semibold hover:underline">
+            <Link href={`/login${redirectTo == '/' ? '' : '?redirect=' + redirectTo}`} className="text-wine font-semibold hover:underline">
               Sign in
             </Link>
           </p>

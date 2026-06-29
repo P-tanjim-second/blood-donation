@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  
+
   // 2. ✅ FIXED: Initialize cleanly to avoid controlled/uncontrolled errors
   const [form, setForm] = useState({
     name: "",
@@ -53,7 +53,7 @@ export default function ProfilePage() {
       district: form.district,
       upazila: form.upazila,
     }
-    const data = await userUpdate(form.id , updateData, "updateProfile");
+    const data = await userUpdate(form.id, updateData, "updateProfile");
     if (data?.message?.id) {
       setUser(data.message);
       setForm(data.message);
@@ -114,7 +114,7 @@ export default function ProfilePage() {
               {user?.status}
             </span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-parchment text-slate capitalize">
-              {user?.role}
+              {user?.userRole}
             </span>
           </div>
         </div>

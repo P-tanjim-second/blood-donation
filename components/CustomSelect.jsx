@@ -42,9 +42,9 @@ export const CustomSelect = ({ options, value, placeholder, onChange, disable=fa
             {isOpen && (
                 <div className="absolute p-2 z-50 bottom-16 w-full mt-2 bg-white border border-gray-100 rounded-3xl shadow-xl overflow-hidden">
                     <ul className="max-h-60 overflow-y-auto">
-                        {options.map((option) => (
+                        {options.map((option, i) => (
                             <li
-                                key={option}
+                                key={i}
                                 onClick={() => {
                                     onChange(option);
                                     setIsOpen(false);

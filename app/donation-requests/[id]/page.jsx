@@ -92,7 +92,8 @@ export default function RequestDetailPage() {
     const res = await updateRequest(req._id, {
       donorName: user.name,
       donorEmail: user.email,
-      status: 'inprogress'
+      status: 'inprogress',
+      lastDonated: new Date().toISOString().split("T")[0],
     });
     if (res.status == 200) {
       toast.success("Thank you for your donation!");

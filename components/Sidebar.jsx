@@ -26,7 +26,7 @@ const ICONS = {
 };
 
 // Role-based nav config
-const getNavItems = (role) => {
+const getNavItems = (userRole) => {
   const common = [
     { label: "Dashboard", href: "/dashboard", icon: "home" },
     { label: "My Profile", href: "/dashboard/profile", icon: "profile" },
@@ -44,8 +44,8 @@ const getNavItems = (role) => {
     { label: "All Requests", href: "/dashboard/all-blood-donation-request", icon: "requests" },
   ];
 
-  if (role === "admin") return [...common, ...donorItems, ...adminItems];
-  if (role === "volunteer") return [...common, ...volunteerItems];
+  if (userRole === "admin") return [...common, ...donorItems, ...adminItems];
+  if (userRole === "volunteer") return [...common, ...volunteerItems];
   return [...common, ...donorItems];
 };
 
@@ -60,7 +60,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const navItems = getNavItems(user?.role) || 'donor';
+  const navItems = getNavItems(user?.userRole) || 'donor';
 
 
   useEffect(() => {
@@ -130,10 +130,10 @@ export default function Sidebar() {
                 <Chip
                   size="sm"
                   variant="flat"
-                  color={ROLE_COLORS[user?.role] || "default"}
+                  color={ROLE_COLORS[user?.userRole] || "default"}
                   className="h-4 text-[10px] px-1.5 capitalize"
                 >
-                  {user?.role}
+                  {user?.userRole}
                 </Chip>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
               </div>

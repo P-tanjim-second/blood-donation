@@ -12,9 +12,9 @@ import TableSkeleton from "@/components/TableSkeleton";
 
 const STATUS_FILTER = ["all", "active", "blocked"];
 const ROLE_CHIP = {
-  admin:     { color: "danger",  label: "Admin" },
+  admin: { color: "danger", label: "Admin" },
   volunteer: { color: "warning", label: "Volunteer" },
-  donor:     { color: "primary", label: "Donor" },
+  donor: { color: "primary", label: "Donor" },
 };
 
 export default function AllUsers({ currentStatusFilter, currentPage }) {
@@ -33,11 +33,11 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
         page: currentPage,
         limit: itemsPerPage,
       };
-      
+
       if (currentStatusFilter !== "all") {
         options.status = currentStatusFilter;
       }
-      
+
       const data = await getAllUsers(options);
       setUsers(data.users || []);
 
@@ -61,33 +61,33 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
 
   const handleFilterChange = (status) => {
     const params = new URLSearchParams();
-    
+
     if (status !== "all") {
       params.set("status", status);
     }
-    
+
     router.push(`${pathname}?${params.toString()}`);
   };
 
   const handlePageChange = (page) => {
     const params = new URLSearchParams();
-    
+
     if (currentStatusFilter !== "all") {
       params.set("status", currentStatusFilter);
     }
-    
+
     if (page > 1) {
       params.set("page", page.toString());
     }
-    
+
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleRoleChange = async (userId, role) => {
-    const data = await userUpdate(userId, { role }, 'updateRole');
+  const handleRoleChange = async (userId, userRole) => {
+    const data = await userUpdate(userId, { userRole }, 'updateRole');
     if (data.message?.user?.id) {
-      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role } : u));
-      toast.success(`${data.message.user.name} is now ${data.message.user.role}`);
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, userRole } : u));
+      toast.success(`${data.message.user.name} is now ${data.message.user.userRole}`);
     } else {
       toast.error("Something went wrong. Please try again later");
     }
@@ -120,12 +120,11 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
         {STATUS_FILTER.map((s) => (
           <button
             key={s}
-            onClick={() => handleFilterChange(s)} 
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${
-              currentStatusFilter === s
+            onClick={() => handleFilterChange(s)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${currentStatusFilter === s
                 ? "bg-wine text-white border-wine"
                 : "bg-white border-border text-ash hover:text-charcoal"
-            }`}
+              }`}
           >
             {s}
           </button>
@@ -134,7 +133,7 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
 
       <div className="bg-white border border-border rounded-2xl overflow-hidden flex flex-col gap-4">
         {loading ? (
-          <TableSkeleton theads={["User", "Blood Group", "Role", "Status", "Actions"]}/>
+          <TableSkeleton theads={["User", "Blood Group", "Role", "Status", "Actions"]} />
         ) : (
           <>
             <div className="overflow-x-auto">
@@ -157,7 +156,7 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
                     </tr>
                   ) : (
                     users.map((u) => {
-                      const roleCfg = ROLE_CHIP[u.role] || { color: "default", label: u.role };
+                      const roleCfg = ROLE_CHIP[u.userRole] || { color: "default", label: u.userRole };
                       return (
                         <tr key={u._id} className="hover:bg-cream/40 transition-colors">
                           <td className="px-5 py-4">
@@ -214,13 +213,13 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
                                     Unblock User
                                   </DropdownItem>
                                 )}
-                                {u.role !== "volunteer" && (
+                                {u.userRole !== "volunteer" && (
                                   <DropdownItem key="volunteer"
                                     onPress={() => handleRoleChange(u.id, "volunteer")}>
                                     Make Volunteer
                                   </DropdownItem>
                                 )}
-                                {u.role !== "admin" && (
+                                {u.userRole !== "admin" && (
                                   <DropdownItem key="admin" color="warning"
                                     onPress={() => handleRoleChange(u.id, "admin")}>
                                     Make Admin

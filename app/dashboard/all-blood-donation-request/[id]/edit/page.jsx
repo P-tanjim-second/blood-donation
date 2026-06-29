@@ -53,8 +53,8 @@ export default function AdminEditRequestPage() {
                     return;
                 }
 
-                const role = session.user.role;
-                if (role !== "admin") {
+                const userRole = session.user.userRole;
+                if (userRole !== "admin") {
                     router.replace("/dashboard");
                     return;
                 }

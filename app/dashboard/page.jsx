@@ -76,7 +76,7 @@ export default function DashboardPage() {
       const session = await getUser();
       if (session?.user) {
         setUser(session.user)
-        if (session?.user?.role === "admin" || session?.user?.role === "volunteer") {
+        if (session?.user?.userRole === "admin" || session?.user?.userRole === "volunteer") {
           const totalDonors = await getAllDonors();
           setTotalDonors(parseInt(totalDonors.total));
           const totalRequests = await getAllRequests("all", 1, "all");
@@ -92,13 +92,13 @@ export default function DashboardPage() {
     session()
   }, [])
 
-  const isAdmin = user?.role === "admin";
-  const isVolunteer = user?.role === "volunteer";
+  const isAdmin = user?.userRole === "admin";
+  const isVolunteer = user?.userRole === "volunteer";
 
 
 
   useEffect(() => {
-    if (!isAdmin && !isVolunteer && user?.role == 'donor') {
+    if (!isAdmin && !isVolunteer && user?.userRole == 'donor') {
 
       async function getRecentRequests() {
         const { requests } = await getMyDonationRequests(user?.email, { limit: 3 });
@@ -122,11 +122,11 @@ export default function DashboardPage() {
           </h1> :
             <h1 className="font-display capitalize text-3xl sm:text-4xl font-medium text-ivory mt-1">Loading...</h1>
           }
-          {user ? <p className="text-ivory/60 text-sm mt-1 capitalize">{user?.role} · {user?.bloodGroup}</p> :
+          {user ? <p className="text-ivory/60 text-sm mt-1 capitalize">{user?.userRole} · {user?.bloodGroup}</p> :
             <p className="h-5 w-20 rounded-lg bg-cream animate-pulse mt-1"></p>
           }
         </div>
-        {user?.role === "donor" && (
+        {user?.userRole === "donor" && (
           <div className="relative">
             <Link href="/dashboard/create-donation-request">
               <Button className="bg-ivory text-wine font-semibold rounded-full hover:bg-cream transition-colors">
