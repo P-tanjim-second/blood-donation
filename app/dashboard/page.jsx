@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
 // import { donationRequestsAPI, statsAPI } from "@/lib/api";
 import { redirect } from "next/navigation";
-import { getAllUsers, getUser } from "@/lib/api/user/user";
+import { getAllDonors, getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
 import { dashboardData, getAllRequests, getMyDonationRequests, getTotalFunding, getUsersCount } from "@/lib/api/server/action";
 import { serverFetch } from "@/lib/api/core/core";
@@ -77,7 +77,7 @@ export default function DashboardPage() {
       if (session?.user) {
         setUser(session.user)
         if (session?.user?.role === "admin" || session?.user?.role === "volunteer") {
-          const totalDonors = await getUsersCount('donor');
+          const totalDonors = await getAllDonors();
           setTotalDonors(parseInt(totalDonors.total));
           const totalRequests = await getAllRequests("all", 1, "all");
           setTotalRequests(parseInt(totalRequests.total));

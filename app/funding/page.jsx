@@ -41,7 +41,7 @@ export default function FundingPage() {
   const [paid, setPaid] = useState(false);
   const router = useRouter();
 
-  useEffect( () => {
+  useEffect(() => {
 
     async function checkAuthAndFetchData() {
       try {
@@ -153,7 +153,7 @@ export default function FundingPage() {
             </Button>
           </div>
 
-          <div className="bg-surface border border-border rounded-2xl overflow-hidden">
+          <div className="bg-white border border-border rounded-2xl overflow-hidden">
             {loading ? (
               <div className="p-8 space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-12 rounded-xl bg-cream animate-pulse" />)}

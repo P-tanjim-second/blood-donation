@@ -85,7 +85,7 @@ export default function RequestDetailPage() {
     initializePage();
   }, [id, router]);
 
-  
+
 
   const handleDonate = async () => {
     setDonating(true);
@@ -97,8 +97,8 @@ export default function RequestDetailPage() {
     if (res.status == 200) {
       toast.success("Thank you for your donation!");
     }
-    else{
-        toast.error("Failed to update request!");
+    else {
+      toast.error("Failed to update request!");
     }
     setReq((r) => ({
       ...r,
@@ -165,7 +165,7 @@ export default function RequestDetailPage() {
             {/* Main card */}
             <div className="lg:col-span-2 space-y-5">
               {/* Header */}
-              <div className="bg-surface border border-border rounded-2xl p-7">
+              <div className="bg-white border border-border rounded-2xl p-7">
                 <div className="flex items-start justify-between gap-4 mb-6">
                   <div>
                     <p className="eyebrow mb-2">Blood Donation Request</p>
@@ -196,7 +196,7 @@ export default function RequestDetailPage() {
               </div>
 
               {/* Message */}
-              <div className="bg-surface border border-border rounded-2xl p-7">
+              <div className="bg-white border border-border rounded-2xl p-7">
                 <h2 className="font-semibold text-charcoal mb-3 text-sm uppercase tracking-wider">
                   Why Blood is Needed
                 </h2>
@@ -216,7 +216,7 @@ export default function RequestDetailPage() {
             {/* Sidebar */}
             <div className="space-y-4">
               {/* Status card */}
-              <div className="bg-surface border border-border rounded-2xl p-6">
+              <div className="bg-white border border-border rounded-2xl p-6">
                 <p className="text-xs font-semibold text-ash uppercase tracking-wider mb-3">
                   Request Status
                 </p>

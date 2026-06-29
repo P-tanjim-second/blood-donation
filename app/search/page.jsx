@@ -4,9 +4,10 @@ import { useSearchParams } from "next/navigation";
 import { Button, Avatar, Select, SelectItem } from "@heroui/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { searchAPI } from "@/lib/api";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { CustomSelect } from "@/components/CustomSelect";
+import toast from "react-hot-toast";
+import { getAllDonors } from "@/lib/api/user/user";
 
 const BG = {
   "A+": "bg-red-50 text-red-700", "B+": "bg-orange-50 text-orange-700",
@@ -17,7 +18,7 @@ const BG = {
 
 function DonorCard({ donor }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-6 hover-lift flex flex-col gap-5">
+    <div className="bg-white border border-border rounded-2xl p-6 hover-lift flex flex-col gap-5">
       <div className="flex items-center gap-4">
         <Avatar src={donor.avatar} name={donor.name} size="lg" isBordered
           color={donor.available ? "primary" : "default"} />
@@ -60,7 +61,7 @@ function SearchContent() {
   });
   const [results, setResults] = useState([]);
   const [searched, setSearched] = useState(false);
-  const [loading, setLoading]   = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const upazilas = form.district ? (UPAZILAS[form.district] || []) : [];
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -75,10 +76,23 @@ function SearchContent() {
   const handleSearch = async (e) => {
     e?.preventDefault();
     setLoading(true);
-    const { donors } = await searchAPI.searchDonors(form);
-    setResults(donors);
-    setSearched(true);
-    setLoading(false);
+    try {
+      if (!form.bloodGroup && !form.district && !form.upazila) {
+        toast.error("Please select at least one field");
+        return;
+      }
+
+      const response = await getAllDonors(form);
+
+      const donors = response?.donors || [];
+      setResults(donors);
+    } catch (error) {
+      console.error("Search page: donor fetch failed", error);
+      toast.error("Something wrong during fetching donors");
+    } finally {
+      setSearched(true);
+      setLoading(false);
+    }
   };
 
   // PDF download (optional feature)
@@ -100,7 +114,7 @@ function SearchContent() {
           </h1>
 
           <form onSubmit={handleSearch}
-            className="bg-surface border border-border rounded-2xl p-5
+            className="bg-white border border-border rounded-2xl p-5
                        flex flex-col sm:flex-row gap-3 max-w-3xl">
             <div className="flex-1">
               <label className="form-label text-[11px]">Blood Group</label>
@@ -123,7 +137,7 @@ function SearchContent() {
             <div className="flex-1">
               <label className="form-label text-[11px]">Upazila</label>
               <CustomSelect className="form-input mt-1"
-              placeholder={"Upazila"}
+                placeholder={"Upazila"}
                 value={form.upazila} onChange={(value) => update("upazila", value)}
                 options={upazilas}
               />
@@ -153,7 +167,7 @@ function SearchContent() {
           </div>
         ) : loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {[1,2,3,4,5,6].map((i) => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="h-52 rounded-2xl bg-cream animate-pulse" />
             ))}
           </div>
@@ -184,7 +198,7 @@ function SearchContent() {
   );
 }
 
-export default function SearchPage() {
+export default function SearchDonor() {
   return (
     <>
       <Navbar />

@@ -7,14 +7,14 @@ import Footer from "@/components/Footer";
 import { getAllRequests } from "@/lib/api/server/action";
 
 const BG_COLORS = {
-  "A+":  "bg-red-50   text-red-700   border-red-200",
-  "A-":  "bg-rose-50  text-rose-700  border-rose-200",
-  "B+":  "bg-orange-50 text-orange-700 border-orange-200",
-  "B-":  "bg-amber-50 text-amber-700 border-amber-200",
+  "A+": "bg-red-50   text-red-700   border-red-200",
+  "A-": "bg-rose-50  text-rose-700  border-rose-200",
+  "B+": "bg-orange-50 text-orange-700 border-orange-200",
+  "B-": "bg-amber-50 text-amber-700 border-amber-200",
   "AB+": "bg-purple-50 text-purple-700 border-purple-200",
   "AB-": "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200",
-  "O+":  "bg-blue-50   text-blue-700   border-blue-200",
-  "O-":  "bg-sky-50    text-sky-700    border-sky-200",
+  "O+": "bg-blue-50   text-blue-700   border-blue-200",
+  "O-": "bg-sky-50    text-sky-700    border-sky-200",
 };
 
 
@@ -38,7 +38,7 @@ function formatTo12Hour(timeStr) {
 
 function RequestCard({ req }) {
   return (
-    <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col gap-4 hover-lift">
+    <div className="bg-white border border-border rounded-2xl p-6 flex flex-col gap-4 hover-lift">
       {/* Top */}
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -102,7 +102,7 @@ function RequestCard({ req }) {
 export default function DonationRequestsPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -113,7 +113,7 @@ export default function DonationRequestsPage() {
       setLoading(true);
       try {
         const response = await getAllRequests("pending", currentPage, itemsPerPage);
-        
+
         setRequests(response.requests || []);
         setTotalPages(Math.ceil(response.total / itemsPerPage));
       } catch (error) {
@@ -123,7 +123,7 @@ export default function DonationRequestsPage() {
       }
     }
     getRequests();
-  }, [currentPage]); 
+  }, [currentPage]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

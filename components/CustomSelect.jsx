@@ -23,10 +23,10 @@ export const CustomSelect = ({ options, value, placeholder, onChange, disable=fa
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 disabled={disable}
-                className={`w-full flex justify-between items-center px-4 py-3 bg-white rounded-xl border-2 transition-all duration-200 
+                className={`w-full flex justify-between font-semibold text-[15px] items-center px-4 py-3 bg-white rounded-xl border-2 transition-all duration-200 
           ${isOpen ? "border-blue-500 bg-white ring-2 ring-blue-100" : `border-transparent ${disable ? "bg-gray-100" : "hover:bg-gray-200"}`}`}
             >
-                <span className={value ? disable ? "text-gray-500" :"text-gray-900" : "text-gray-500"}>
+                <span className={value ? disable ? "text-gray-500" :"text-charcoal" : "text-gray-500"}>
                     {value || placeholder}
                 </span>
                 {!disable &&<svg
