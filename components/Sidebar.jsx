@@ -83,7 +83,7 @@ export default function Sidebar() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white/70">
       {/* Logo */}
-      <div className={`flex items-center gap-3 px-5 h-16 border-b border-border shrink-0 ${collapsed ? "justify-center px-3" : ""}`}>
+      <Link href="/" className={`flex items-center gap-3 px-5 h-16 border-b border-border shrink-0 ${collapsed ? "justify-center px-3" : ""}`}>
         <div className="w-7 h-7 rounded-full bg-wine flex items-center justify-center shrink-0">
           <svg width="12" height="16" viewBox="0 0 14 18" fill="none">
             <path d="M7 0C7 0 0 9 0 12.5C0 16.09 3.13 18 7 18C10.87 18 14 16.09 14 12.5C14 9 7 0 7 0Z" fill="white" />
@@ -94,7 +94,7 @@ export default function Sidebar() {
             Vitae
           </span>
         )}
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
