@@ -54,12 +54,11 @@ export default function ProfilePage() {
       upazila: form.upazila,
     }
     const data = await userUpdate(form.id, updateData, "updateProfile");
-    if (data?.message?.id) {
-      setUser(data.message);
-      setForm(data.message);
+    if (data?.matchedCount == 1) {
       toast.success("Profile updated successfully!");
+      setForm(prev => ({ ...prev, ...updateData }))
     }
-    if (!data?.message?.id) {
+    if (data?.matchedCount != 1) {
       toast.error("Something went wrong. Please try again later.")
     }
     setSaving(false);
