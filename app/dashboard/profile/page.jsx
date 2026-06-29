@@ -20,7 +20,7 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
 
   const [form, setForm] = useState({
-    id: "", // Ensure ID tracking exists
+    id: "", 
     name: "",
     avatar: "",
     bloodGroup: "",
@@ -32,7 +32,6 @@ export default function ProfilePage() {
     async function session() {
       const session = await getUser();
       if (session?.user) {
-        // Ensure we capture whatever identifier your DB uses (id or _id)
         const userData = {
           ...session.user,
           id: session.user.id || session.user._id || "", 
@@ -58,14 +57,12 @@ export default function ProfilePage() {
       upazila: form.upazila,
     };
 
-    // Double check if form.id or form._id is what your backend expects
     const targetId = form.id || form._id; 
 
     try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
       
-      // Check for structural matching from your API response
-      if (data?.user?.modifiedCount === 1 || data?.modifiedCount === 1 || data?.success) {
+      if (data?.user?.id || data?.user?._id || data?.user) {
         toast.success("Profile updated successfully!");
         
         const updatedUser = { 
@@ -74,7 +71,7 @@ export default function ProfilePage() {
         };
         
         setUser(updatedUser);
-        setForm(updatedUser); // Preserves ID and other omitted fields
+        setForm(updatedUser);
         setSaved(true);
         setEditing(false);
         setTimeout(() => setSaved(false), 3000);
@@ -89,7 +86,7 @@ export default function ProfilePage() {
   };
 
   const handleCancel = () => {
-    setForm(user); // Reset form back to the last saved database state
+    setForm(user); 
     setEditing(false);
   };
 
