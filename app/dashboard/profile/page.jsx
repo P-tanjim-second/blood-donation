@@ -53,7 +53,7 @@ export default function ProfilePage() {
       upazila: form.upazila,
     };
 
-    const targetId = form.id || form._id; 
+    const targetId = form._id; 
 
       const data = await userUpdate(targetId, updateData, "updateProfile");
 
