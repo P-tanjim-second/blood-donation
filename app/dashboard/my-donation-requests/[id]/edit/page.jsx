@@ -28,6 +28,7 @@ export default function EditDonationRequestPage() {
     const [saving, setSaving] = useState(false);
     const [success, setSuccess] = useState(false);
     const [notFound, setNotFound] = useState(false);
+    const [user, setUser] = useState(false);
 
     const [form, setForm] = useState({
         requesterName: "",
@@ -42,6 +43,20 @@ export default function EditDonationRequestPage() {
         donationTime: "",
         requestMessage: "",
     });
+
+    //check user login 
+    useEffect(() => {
+        async function checkUser() {
+            const session = await getUser();
+            if (!session?.user) {
+                router.push("/login");
+            }
+            else{
+                setUser(true)
+            }
+        }
+        checkUser();
+    }, []);
 
     // Load existing request data
     useEffect(() => {
@@ -70,7 +85,9 @@ export default function EditDonationRequestPage() {
                 setLoading(false)
             }
         }
-        name();
+        if(user){
+            name();
+        }
     }, [id]);
 
     const upazilas = form.recipientDistrict

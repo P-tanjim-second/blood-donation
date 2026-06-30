@@ -32,12 +32,8 @@ export default function ProfilePage() {
     async function session() {
       const session = await getUser();
       if (session?.user) {
-        const userData = {
-          ...session.user,
-          id: session.user.id || session.user._id || "", 
-        };
-        setUser(userData);
-        setForm(userData);
+        setUser(session.user);
+        setForm(session.user);
       }
     }
     session();
@@ -62,7 +58,7 @@ export default function ProfilePage() {
     try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
       
-      if (data?.user?.id || data?.user?._id || data?.user) {
+      if (data?.modifiedCount > 0) {
         toast.success("Profile updated successfully!");
         
         const updatedUser = { 

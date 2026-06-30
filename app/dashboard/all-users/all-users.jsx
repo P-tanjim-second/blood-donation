@@ -26,6 +26,33 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
+
+  const checkUser = async () => {
+    try {
+      const session = await getUser();
+      if (session?.user) {
+        if (session.user.userRole !== "admin") {
+          toast.error("Access denied. Admins only.");
+          router.push("/unauthorized");
+          return;
+        }
+        else{
+          loadUsers();
+        }
+      }
+      else{
+        router.push("/login");
+      }
+    } catch {
+      console.error("Error checking user session:");
+      router.push("/login");
+    }
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
   const loadUsers = async () => {
     setLoading(true);
     try {
@@ -83,26 +110,26 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleRoleChange = async (userId, userRole) => {
-    const data = await userUpdate(userId, { userRole }, 'updateRole');
-    if (data.message?.user?.id) {
+  const handleRoleChange = async (userId, userRole, name) => {
+    const data = await userUpdate(userId, {userRole: userRole});
+    if (data.modifiedCount > 0) {
       setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, userRole } : u));
-      toast.success(`${data.message.user.name} is now ${data.message.user.userRole}`);
+      toast.success(`${name} is now ${userRole}`);
     } else {
       toast.error("Something went wrong. Please try again later");
     }
   };
 
-  const handleStatusToggle = async (userId, currentStatus) => {
+  const handleStatusToggle = async (userId, currentStatus, name) => {
     const newStatus = currentStatus === "active" ? "blocked" : "active";
-    const data = await userUpdate(userId, { status: newStatus }, 'updateStatus');
-    if (data.message?.id) {
+    const data = await userUpdate(userId, { status: newStatus });
+    if (data.modifiedCount > 0) {
       if (currentStatusFilter !== "all" && currentStatusFilter !== newStatus) {
         setUsers((prev) => prev.filter((u) => u.id !== userId));
       } else {
         setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
       }
-      toast.success(`${data.message.name} is now ${data.message.status}`);
+      toast.success(`${name} is now ${newStatus}`);
     } else {
       toast.error("Something went wrong. Please try again later");
     }
@@ -204,24 +231,24 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
                               <DropdownMenu aria-label="User actions">
                                 {u.status === "active" ? (
                                   <DropdownItem key="block" color="danger" className="text-danger"
-                                    onPress={() => handleStatusToggle(u.id, u.status)}>
+                                    onPress={() => handleStatusToggle(u.id, u.status, u.name)}>
                                     Block User
                                   </DropdownItem>
                                 ) : (
                                   <DropdownItem key="unblock" color="success"
-                                    onPress={() => handleStatusToggle(u.id, u.status)}>
+                                    onPress={() => handleStatusToggle(u.id, u.status, u.name)}>
                                     Unblock User
                                   </DropdownItem>
                                 )}
                                 {u.userRole !== "volunteer" && (
                                   <DropdownItem key="volunteer"
-                                    onPress={() => handleRoleChange(u.id, "volunteer")}>
+                                    onPress={() => handleRoleChange(u.id, "volunteer", u.name)}>
                                     Make Volunteer
                                   </DropdownItem>
                                 )}
                                 {u.userRole !== "admin" && (
                                   <DropdownItem key="admin" color="warning"
-                                    onPress={() => handleRoleChange(u.id, "admin")}>
+                                    onPress={() => handleRoleChange(u.id, "admin", u.name)}>
                                     Make Admin
                                   </DropdownItem>
                                 )}

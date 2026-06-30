@@ -6,13 +6,15 @@ import { Button, Chip } from "@heroui/react";
 import { redirect } from "next/navigation";
 import { getAllDonors, getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
-import { dashboardData, getAllRequests, getMyDonationRequests, getTotalFunding, getUsersCount } from "@/lib/api/server/action";
-import { serverFetch } from "@/lib/api/core/core";
+import { getAllRequests, getMyDonationRequests, getTotalFunding } from "@/lib/api/server/action";
 
 const STATUS_CHIP = {
-  pending: { color: "warning", label: "Pending" },
+  pending: { color: "warning"   , label:   "Pending" },
+
   inprogress: { color: "primary", label: "In Progress" },
-  done: { color: "success", label: "Done" },
+
+  done: { color: "success"  , label: "Done" },
+
   canceled: { color: "danger", label: "Canceled" },
 };
 
@@ -44,7 +46,7 @@ const ICON_USER = (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />   
   </svg>
 );
 const ICON_DROP = (
@@ -62,7 +64,6 @@ const ICON_MONEY = (
 
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
-  const [stats, setStats] = useState(null);
   const [recentRequests, setRecentRequests] = useState([]);
   const [loadingReqs, setLoadingReqs] = useState(true);
   const [totalDonors, setTotalDonors] = useState(0);
@@ -101,7 +102,7 @@ export default function DashboardPage() {
     if (!isAdmin && !isVolunteer && user?.userRole == 'donor') {
 
       async function getRecentRequests() {
-        const { requests } = await getMyDonationRequests(user?.email, { limit: 3 });
+        const { requests } = await getMyDonationRequests(user?.email, "all", 1, 3);
         setRecentRequests(requests);
         setLoadingReqs(false);
       }

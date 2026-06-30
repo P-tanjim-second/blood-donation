@@ -8,7 +8,6 @@ import {
   useDisclosure, Pagination,
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem
 } from "@heroui/react";
-import { donationRequestsAPI } from "@/lib/api";
 import TableSkeleton from "@/components/TableSkeleton";
 import { getUser } from "@/lib/api/user/user";
 import { getMyDonationRequests } from "@/lib/api/server/action";
@@ -23,16 +22,16 @@ const STATUS_CHIP = {
   canceled: { color: "danger", label: "Canceled" },
 };
 
-// Renamed props to avoid variable conflicts with local state hooks
 export default function MyDonationRequestsPage({ status: initialStatus, page: initialPage }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [user, setUser] = useState(null);
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Initialize state from URL params or fallback to props/defaults
   const [statusFilter, setStatusFilter] = useState(initialStatus || "all");
   const [currentPage, setCurrentPage] = useState(parseInt(initialPage) || 1);
   const [totalPages, setTotalPages] = useState(1);
@@ -61,10 +60,18 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
     router.push(`${pathname}?${params.toString()}`);
   };
 
+  const loadUser = async () => {
+    const session = await getUser();
+    if(session?.user){
+      setUser(session.user)
+    }else{
+      router.push("/login");
+    }
+  }
+
   const loadRequests = async () => {
     setLoading(true);
     try {
-      const { user } = await getUser();
       const res = await getMyDonationRequests(
         user?.email,
         statusFilter,
@@ -79,6 +86,10 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadUser();
+  }, []);
 
   // Trigger data load when state changes
   useEffect(() => { 

@@ -21,7 +21,7 @@ function DonorCard({ donor }) {
     <div className="bg-white border border-border rounded-2xl p-6 hover-lift flex flex-col gap-5">
       <div className="flex items-center gap-4">
         <Avatar src={donor.avatar} name={donor.name} size="lg" isBordered
-          color={donor.available ? "primary" : "default"} />
+          color={"primary"} />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-charcoal truncate">{donor.name}</p>
           <p className="text-xs text-ash mt-0.5">{donor.district}, {donor.upazila}</p>
@@ -29,9 +29,9 @@ function DonorCard({ donor }) {
             <span className={`font-mono font-bold text-sm px-2.5 py-0.5 rounded-lg ${BG[donor.bloodGroup] || "bg-gray-50 text-gray-700"}`}>
               {donor.bloodGroup}
             </span>
-            <span className={`flex items-center gap-1 text-xs font-medium ${donor.available ? "text-green-600" : "text-ash"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${donor.available ? "bg-green-500 animate-pulse" : "bg-ash"}`} />
-              {donor.available ? "Available" : "Unavailable"}
+            <span className={`flex items-center gap-1 text-xs font-medium ${"text-green-600"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${"bg-green-500 animate-pulse"}`} />
+              {"Available"}
             </span>
           </div>
         </div>
@@ -39,15 +39,13 @@ function DonorCard({ donor }) {
 
       <div className="text-xs text-ash border-t border-border pt-4">
         Last donated:{" "}
-        <span className="text-charcoal font-medium">{donor.lastDonated || "N/A"}</span>
+        <span className="text-charcoal font-medium">{donor.lastDonated}</span>
       </div>
 
-      {donor.available && (
         <Button size="sm"
           className="bg-wine text-white font-semibold rounded-xl hover:bg-wine-dark transition-colors">
           Contact Donor
         </Button>
-      )}
     </div>
   );
 }

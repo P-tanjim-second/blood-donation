@@ -64,12 +64,13 @@ export default function RequestDetailPage() {
       setLoading(true);
       try {
         const session = await getUser();
-        if (!session?.user) {
+        if (session?.user) {
+          setUser(session.user);
+        }
+        else{
           router.replace(`/login?redirect=/donation-requests/${id}`);
           return;
         }
-
-        setUser(session.user);
 
         // 2. Request fetching: Only executes if user session validation passes
         const res = await getRequestById(id);
