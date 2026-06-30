@@ -85,9 +85,7 @@ export default function EditDonationRequestPage() {
                 setLoading(false)
             }
         }
-        if(user){
             name();
-        }
     }, [id]);
 
     const upazilas = form.recipientDistrict
