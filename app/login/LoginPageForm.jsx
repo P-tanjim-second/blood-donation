@@ -183,8 +183,8 @@ export default function LoginPageForm({redirectTo}) {
           {/* Demo hint */}
           <div className="p-4 rounded-xl bg-cream border border-border text-xs text-ash">
             <p className="font-semibold text-charcoal mb-1">Demo credentials</p>
-            <p>Email: <code className="font-mono text-wine">demo@vitae.app</code></p>
-            <p>Password: <code className="font-mono text-wine">demo123</code></p>
+            <p>Email: <code className="font-mono text-wine">apon@apon.com</code></p>
+            <p>Password: <code className="font-mono text-wine">asdf12345</code></p>
           </div>
         </div>
       </div>
