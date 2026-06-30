@@ -53,6 +53,8 @@ export default function ProfilePage() {
       upazila: form.upazila,
     };
 
+    toast.success(updateData.name + " " + updateData.bloodGroup + " " + updateData.district + " " + updateData.upazila);
+
     const targetId = user?.id || user?._id || form.id || form._id;
 
     if (!targetId) {
@@ -63,7 +65,7 @@ export default function ProfilePage() {
 
     try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
-      console.log("Update response:", data);
+      // console.log("Update response:", data);
 
       if (data?.user?.modifiedCount > 0 || data?.status === 200) {
         toast.success("Profile updated successfully!");
@@ -82,7 +84,6 @@ export default function ProfilePage() {
         toast.error(data?.message || "Something went wrong. Please try again later.");
       }
     } catch (error) {
-      console.error("Profile update failed:", error);
       toast.error("Something went wrong. Please try again later.");
     } finally {
       setSaving(false);
