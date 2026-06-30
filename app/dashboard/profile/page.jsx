@@ -53,7 +53,7 @@ export default function ProfilePage() {
       upazila: form.upazila,
     };
 
-    toast.success(updateData.name + " " + updateData.bloodGroup + " " + updateData.district + " " + updateData.upazila);
+    // toast.success(updateData.name + " " + updateData.bloodGroup + " " + updateData.district + " " + updateData.upazila);
 
     const targetId = user?.id || user?._id || form.id || form._id;
 
