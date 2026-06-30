@@ -58,7 +58,7 @@ export default function ProfilePage() {
     try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
       
-      if (data?.modifiedCount > 0) {
+      if (data?.?.modifiedCount > 0) {
         toast.success("Profile updated successfully!");
         
         const updatedUser = { 
