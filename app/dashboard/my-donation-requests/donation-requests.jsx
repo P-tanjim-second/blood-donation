@@ -62,26 +62,35 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
 
   const loadUser = async () => {
     const session = await getUser();
-    if(session?.user){
-      setUser(session.user)
-    }else{
+    if (session?.user) {
+      setUser(session.user);
+    } else {
       router.push("/login");
     }
-  }
+  };
 
   const loadRequests = async () => {
+    if (!user?.email) {
+      setRequests([]);
+      setTotalPages(1);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await getMyDonationRequests(
-        user?.email,
+        user.email,
         statusFilter,
         currentPage,
         6,
       );
-      setRequests(res.requests || []);
-      setTotalPages(Math.ceil(res.total / 6) || 1);
+      setRequests(res?.requests || []);
+      setTotalPages(Math.max(1, Math.ceil((res?.total || 0) / 6)));
     } catch (error) {
       console.error("Failed to fetch requests:", error);
+      setRequests([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -89,12 +98,13 @@ export default function MyDonationRequestsPage({ status: initialStatus, page: in
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [router]);
 
   // Trigger data load when state changes
-  useEffect(() => { 
-    loadRequests(); 
-  }, [statusFilter, currentPage]);
+  useEffect(() => {
+    if (!user) return;
+    loadRequests();
+  }, [user, statusFilter, currentPage]);
 
   // Sync state if URL changes externally (e.g., back button)
   useEffect(() => {
