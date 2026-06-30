@@ -55,8 +55,9 @@ export default function ProfilePage() {
 
     const targetId = form.id || form._id; 
 
-    try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
+
+      cosnole.log("Update response:", data); // Log the response for debugging
       
       if (data?.message?.modifiedCount > 0) {
         toast.success("Profile updated successfully!");
@@ -72,13 +73,10 @@ export default function ProfilePage() {
         setEditing(false);
         setTimeout(() => setSaved(false), 3000);
       } else {
-        toast.error("No changes made or user not found.");
+        toast.error("Something went wrong. Please try again later.");
       }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again later.");
-    } finally {
+    
       setSaving(false);
-    }
   };
 
   const handleCancel = () => {
