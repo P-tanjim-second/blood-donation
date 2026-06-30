@@ -45,7 +45,7 @@ export default function ProfilePage() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-    
+
     const updateData = {
       name: form.name,
       bloodGroup: form.bloodGroup,
@@ -53,30 +53,40 @@ export default function ProfilePage() {
       upazila: form.upazila,
     };
 
-    const targetId = form._id; 
+    const targetId = user?.id || user?._id || form.id || form._id;
 
+    if (!targetId) {
+      toast.error("User ID is missing. Please refresh and try again.");
+      setSaving(false);
+      return;
+    }
+
+    try {
       const data = await userUpdate(targetId, updateData, "updateProfile");
+      console.log("Update response:", data);
 
-      cosnole.log("Update response:", data); // Log the response for debugging
-      
-      if (data?.message?.modifiedCount > 0) {
+      if (data?.user?.modifiedCount > 0 || data?.status === 200) {
         toast.success("Profile updated successfully!");
-        
-        const updatedUser = { 
-          ...user, 
-          ...updateData 
+
+        const updatedUser = {
+          ...user,
+          ...updateData,
         };
-        
+
         setUser(updatedUser);
         setForm(updatedUser);
         setSaved(true);
         setEditing(false);
         setTimeout(() => setSaved(false), 3000);
       } else {
-        toast.error("Something went wrong. Please try again later.");
+        toast.error(data?.message || "Something went wrong. Please try again later.");
       }
-    
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      toast.error("Something went wrong. Please try again later.");
+    } finally {
       setSaving(false);
+    }
   };
 
   const handleCancel = () => {
