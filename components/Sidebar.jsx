@@ -78,6 +78,8 @@ export default function Sidebar() {
 
   const handleSignOut = async () => {
     await signOut();
+    setUser(null);
+    window.location.href = "/login"
   }
 
   const SidebarContent = () => (
@@ -138,11 +140,11 @@ export default function Sidebar() {
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
               </div>
             </div>
-            <Link href="/login" onClick={handleSignOut}>
-              <Button variant="bordered" className="w-full border-border text-slate rounded-xl">
+            <div>
+              <Button onClick={handleSignOut} variant="bordered" className="w-full border-border text-slate rounded-xl">
                 Log out
               </Button>
-            </Link>
+            </div>
           </div>
         )}
       </div>

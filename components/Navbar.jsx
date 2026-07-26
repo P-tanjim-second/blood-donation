@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { signOut, useSession } from "@/lib/auth-client";
+import { signOut } from "@/lib/auth-client";
 import { getUser } from "@/lib/api/user/user";
 
 const NAV_LINKS = [
@@ -62,6 +62,8 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     await signOut();
+    setLoggedIn(false);
+    setUser(null);
   }
 
   return (
@@ -139,7 +141,7 @@ export default function Navbar() {
                         Profile
                       </Link>
                     </DropdownItem>
-                    
+
                     <DropdownItem key="logout" color="danger" className="text-danger"
                       textValue="Logout">
                       <Link href="/login" onClick={handleSignOut} className="block w-full">

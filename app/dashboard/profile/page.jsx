@@ -80,10 +80,9 @@ export default function ProfilePage() {
         setForm(updatedUser);
         setSaved(true);
         setEditing(false);
-        revalidatePathAction('dashboard/profile')
+        revalidatePathAction('dashboard/profile');
         setTimeout(() => {
           setSaved(false)
-          
         }, 3000);
       } else {
         toast.error(data?.message || "Something went wrong. Please try again later.");
