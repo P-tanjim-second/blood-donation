@@ -53,6 +53,22 @@ export default function RegisterFormPage({ redirectTo }) {
       setError("Password must be at least 6 characters.");
       return;
     }
+    if (avatarPreview === null) {
+      setError("Please upload a profile photo.");
+      return;
+    }
+    if (form.bloodGroup === "") {
+      setError("Please select a blood group.");
+      return;
+    }
+    if (form.district === "") {
+      setError("Please select a district.");
+      return;
+    }
+    if (form.upazila === "") {
+      setError("Please select an upazila.");
+      return;
+    }
     setLoading(true);
     const user = {
       name: form.name,

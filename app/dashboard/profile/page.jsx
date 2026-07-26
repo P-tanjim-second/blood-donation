@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button, Avatar } from "@heroui/react"; // Cleaned up lowercase 'avatar' import
+import { Button, Avatar } from "@heroui/react";
 import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { getUser, userUpdate } from "@/lib/api/user/user";
 import { CustomSelect } from "@/components/CustomSelect";
 import toast from "react-hot-toast";
+import { revalidatePathAction } from "@/lib/api/reuseable/reuseable";
 
 const Field = ({ label, children }) => (
   <div>
@@ -79,7 +80,11 @@ export default function ProfilePage() {
         setForm(updatedUser);
         setSaved(true);
         setEditing(false);
-        setTimeout(() => setSaved(false), 3000);
+        revalidatePathAction('dashboard/profile')
+        setTimeout(() => {
+          setSaved(false)
+          
+        }, 3000);
       } else {
         toast.error(data?.message || "Something went wrong. Please try again later.");
       }
