@@ -9,7 +9,6 @@ import { CustomSelect } from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 import { postDonationRequest } from "@/lib/api/server/mutation";
 
-// 1. ✅ FIXED: Moved Field OUTSIDE the component so it doesn't remount on every keystroke
 const Field = ({ label, required, children }) => (
   <div>
     <label className="form-label">
@@ -64,6 +63,14 @@ export default function CreateDonationRequestPage() {
     e.preventDefault();
     if (user?.status === "blocked") {
       alert("Your account is blocked. You cannot create donation requests.");
+      return;
+    }
+    if (form.recipientDistrict == '') {
+      toast.error("Please select recipient district.");
+      return;
+    }
+    if (form.recipientUpazila == '') {
+      toast.error("Please select recipient upazila.");
       return;
     }
     setLoading(true);

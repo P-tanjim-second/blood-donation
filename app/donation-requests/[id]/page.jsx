@@ -9,7 +9,7 @@ import {
 } from "@heroui/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getUser } from "@/lib/api/user/user";
+import { getUser, userUpdate } from "@/lib/api/user/user";
 import { getRequestById } from "@/lib/api/server/action";
 import { updateRequest } from "@/lib/api/server/mutation";
 import toast from "react-hot-toast";
@@ -67,7 +67,7 @@ export default function RequestDetailPage() {
         if (session?.user) {
           setUser(session.user);
         }
-        else{
+        else {
           router.replace(`/login?redirect=/donation-requests/${id}`);
           return;
         }
@@ -89,28 +89,40 @@ export default function RequestDetailPage() {
 
 
   const handleDonate = async () => {
-    setDonating(true);
-    const res = await updateRequest(req._id, {
-      donorName: user.name,
-      donorEmail: user.email,
-      status: 'inprogress',
-      lastDonated: new Date().toISOString().split("T")[0],
-    });
-    if (res.status == 200) {
+    try {
+      setDonating(true);
+
+      const res = await updateRequest(req._id, {
+        donorName: user.name,
+        donorEmail: user.email,
+        status: "inprogress",
+      });
+
+      if (res.status !== 200) {
+        toast.error("Failed to update request!");
+        return;
+      }
+
+      await userUpdate(user.id, {
+        lastDonated: new Date().toISOString().split("T")[0],
+      });
+
+      setReq((r) => ({
+        ...r,
+        status: "inprogress",
+        donorName: user.name,
+        donorEmail: user.email,
+      }));
+
+      setDonated(true);
       toast.success("Thank you for your donation!");
+      onClose();
+    } catch (err) {
+      toast.error("Something went wrong.");
+      console.error(err);
+    } finally {
+      setDonating(false);
     }
-    else {
-      toast.error("Failed to update request!");
-    }
-    setReq((r) => ({
-      ...r,
-      status: "inprogress",
-      donorName: user.name,
-      donorEmail: user.email,
-    }));
-    setDonating(false);
-    setDonated(true);
-    onClose();
   };
 
   if (loading) {
