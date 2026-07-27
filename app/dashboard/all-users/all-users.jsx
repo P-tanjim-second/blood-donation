@@ -6,7 +6,7 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
   Pagination,
 } from "@heroui/react";
-import { getAllUsers, userUpdate } from "@/lib/api/user/user";
+import { getAllUsers, getUser, userUpdate } from "@/lib/api/user/user";
 import toast from "react-hot-toast";
 import TableSkeleton from "@/components/TableSkeleton";
 
@@ -36,11 +36,11 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
           router.push("/unauthorized");
           return;
         }
-        else{
+        else {
           loadUsers();
         }
       }
-      else{
+      else {
         router.push("/login");
       }
     } catch {
@@ -111,9 +111,9 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
   };
 
   const handleRoleChange = async (userId, userRole, name) => {
-    const data = await userUpdate(userId, {userRole: userRole});
-    if (data.modifiedCount > 0) {
-      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, userRole } : u));
+    const data = await userUpdate(userId, { userRole: userRole });
+    if (data.status == 200) {
+      setUsers((prev) => prev.map((u) => u._id == userId ? { ...u, userRole } : u));
       toast.success(`${name} is now ${userRole}`);
     } else {
       toast.error("Something went wrong. Please try again later");
@@ -123,11 +123,11 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
   const handleStatusToggle = async (userId, currentStatus, name) => {
     const newStatus = currentStatus === "active" ? "blocked" : "active";
     const data = await userUpdate(userId, { status: newStatus });
-    if (data.modifiedCount > 0) {
+    if (data.status == 200) {
       if (currentStatusFilter !== "all" && currentStatusFilter !== newStatus) {
-        setUsers((prev) => prev.filter((u) => u.id !== userId));
+        setUsers((prev) => prev.filter((u) => u._id !== userId));
       } else {
-        setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, status: newStatus } : u));
+        setUsers((prev) => prev.map((u) => u._id === userId ? { ...u, status: newStatus } : u));
       }
       toast.success(`${name} is now ${newStatus}`);
     } else {
@@ -149,8 +149,8 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
             key={s}
             onClick={() => handleFilterChange(s)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium border capitalize transition-all ${currentStatusFilter === s
-                ? "bg-wine text-white border-wine"
-                : "bg-white border-border text-ash hover:text-charcoal"
+              ? "bg-wine text-white border-wine"
+              : "bg-white border-border text-ash hover:text-charcoal"
               }`}
           >
             {s}
@@ -231,24 +231,24 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
                               <DropdownMenu aria-label="User actions">
                                 {u.status === "active" ? (
                                   <DropdownItem key="block" color="danger" className="text-danger"
-                                    onPress={() => handleStatusToggle(u.id, u.status, u.name)}>
+                                    onPress={() => handleStatusToggle(u._id, u.status, u.name)}>
                                     Block User
                                   </DropdownItem>
                                 ) : (
                                   <DropdownItem key="unblock" color="success"
-                                    onPress={() => handleStatusToggle(u.id, u.status, u.name)}>
+                                    onPress={() => handleStatusToggle(u._id, u.status, u.name)}>
                                     Unblock User
                                   </DropdownItem>
                                 )}
                                 {u.userRole !== "volunteer" && (
                                   <DropdownItem key="volunteer"
-                                    onPress={() => handleRoleChange(u.id, "volunteer", u.name)}>
+                                    onPress={() => handleRoleChange(u._id, "volunteer", u.name)}>
                                     Make Volunteer
                                   </DropdownItem>
                                 )}
                                 {u.userRole !== "admin" && (
                                   <DropdownItem key="admin" color="warning"
-                                    onPress={() => handleRoleChange(u.id, "admin", u.name)}>
+                                    onPress={() => handleRoleChange(u._id, "admin", u.name)}>
                                     Make Admin
                                   </DropdownItem>
                                 )}
