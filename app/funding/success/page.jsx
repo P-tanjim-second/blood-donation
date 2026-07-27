@@ -11,6 +11,7 @@ export const metadata = {
 export default async function FundingSuccessPage({ searchParams }) {
   const params = await searchParams;
   const {session_id} = await searchParams;
+  const amount = params.amount ? Number(params.amount) : null;
 
   const {
         status,
@@ -19,14 +20,28 @@ export default async function FundingSuccessPage({ searchParams }) {
         expand: ['line_items', 'payment_intent']
     });
 
-    console.log(status, customer_details)
+    console.log('status', status)
+    console.log('customer_details', customer_details)
+
+    if (status == "complete") {
+        await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/funder`, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: customer_details.email,
+                amount: amount,
+            })
+        })
+    }
 
   // Stripe appends these automatically to your return_url
   const paymentIntent  = status;
   const redirectStatus = params.redirect_status ?? "succeeded";
 
   // Your app appends ?amount=500 to the return_url before passing to Stripe
-  const amount = params.amount ? Number(params.amount) : null;
+  
 
   // Date formatted on the server — no hydration mismatch on client
   const date = new Date().toLocaleDateString("en-BD", {
