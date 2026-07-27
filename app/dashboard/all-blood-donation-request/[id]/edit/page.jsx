@@ -18,6 +18,16 @@ const STATUS_CHIP = {
     canceled: { color: "danger", label: "Canceled" },
 };
 
+const Field = ({ label, required, children }) => (
+        <div>
+            <label className="form-label">
+                {label}
+                {required && <span className="text-wine ml-0.5">*</span>}
+            </label>
+            {children}
+        </div>
+    );
+
 export default function AdminEditRequestPage() {
     const router = useRouter();
     const params = useParams();
@@ -111,15 +121,7 @@ export default function AdminEditRequestPage() {
         }
     };
 
-    const Field = ({ label, required, children }) => (
-        <div>
-            <label className="form-label">
-                {label}
-                {required && <span className="text-wine ml-0.5">*</span>}
-            </label>
-            {children}
-        </div>
-    );
+    
 
     if (loading) {
         return (

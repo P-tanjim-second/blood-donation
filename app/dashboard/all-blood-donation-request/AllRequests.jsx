@@ -11,7 +11,7 @@ import {
   Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
 } from "@heroui/react";
 import { donationRequestsAPI } from "@/lib/api";
-import { getUser } from "@/lib/api/user/user";
+import { getUser, userUpdate } from "@/lib/api/user/user";
 import { toast } from "react-hot-toast"; // Make sure to import toast if you use it
 import { getAllRequests } from "@/lib/api/server/action";
 import TableSkeleton from "@/components/TableSkeleton";
@@ -103,13 +103,16 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
   const changeStatus = async (id, updatedStatus) => {
     if (updatedStatus === "inprogress") {
       const res = await updateRequest(id, { status: updatedStatus, donorName: user.name, donorEmail: user.email });
-      if (res.status === 200) {
-        toast.success("Request accepted successfully!");
-        setRequests((prev) => prev.map((r) => r._id === id ? { ...r, status: updatedStatus, donorName: user.name, donorEmail: user.email } : r));
-      }
-      else {
+      if (res.status !== 200) {
         toast.error("Failed to accept request!");
+        return;
       }
+      await userUpdate(user.id, {
+        lastDonated: new Date().toISOString().split("T")[0],
+      });
+
+      toast.success("Request accepted successfully!");
+      setRequests((prev) => prev.map((r) => r._id === id ? { ...r, status: updatedStatus, donorName: user.name, donorEmail: user.email } : r));
     } else {
       const res = await updateRequest(id, { status: updatedStatus });
       if (res.status === 200) {
