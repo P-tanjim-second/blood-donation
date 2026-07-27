@@ -229,15 +229,18 @@ export default function FundingPage() {
             </form>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onClose}>Cancel</Button>
-            <Button
-              type="submit"
-              form="fund-form"
-              isLoading={paying}
-              className="bg-wine text-white font-semibold"
-            >
-              Pay ৳{Number(amount || 0).toLocaleString()}
-            </Button>
+            
+            <form action="/api/checkout_sessions" method="POST">
+              <section>
+                <input type="hidden" name="amount" value={amount} />
+                <Button variant="light" className="mr-2" onPress={onClose}>Cancel</Button>
+                <button type="submit" role="link" disabled={paying}
+                  className="bg-wine text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-wine-dark transition-all text-sm shadow-sm">
+                  Pay ৳{Number(amount || 0).toLocaleString()}
+                </button>
+              </section>
+            </form>
+
           </ModalFooter>
         </ModalContent>
       </Modal>
