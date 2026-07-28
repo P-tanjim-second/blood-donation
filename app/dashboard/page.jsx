@@ -9,11 +9,11 @@ import TableSkeleton from "@/components/TableSkeleton";
 import { getAllRequests, getMyDonationRequests, getTotalFunding } from "@/lib/api/server/action";
 
 const STATUS_CHIP = {
-  pending: { color: "warning"   , label:   "Pending" },
+  pending: { color: "warning", label: "Pending" },
 
   inprogress: { color: "primary", label: "In Progress" },
 
-  done: { color: "success"  , label: "Done" },
+  done: { color: "success", label: "Done" },
 
   canceled: { color: "danger", label: "Canceled" },
 };
@@ -46,7 +46,7 @@ const ICON_USER = (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
     strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />   
+    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
   </svg>
 );
 const ICON_DROP = (
@@ -225,10 +225,10 @@ export default function DashboardPage() {
           <h2 className="font-semibold text-charcoal text-lg mb-4">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              { label: "Manage All Users", desc: "Block, unblock, change roles", href: "/dashboard/all-users", color: "bg-wine/8 text-wine" },
               { label: "All Donation Requests", desc: "View and manage every request", href: "/dashboard/all-blood-donation-request", color: "bg-blue-50 text-blue-700" },
-            ].map((item) => (
-              <Link key={item.href} href={item.href}>
+              isAdmin && { label: "Manage All Users", desc: "Block, unblock, change roles", href: "/dashboard/all-users", color: "bg-wine/8 text-wine" },
+            ].filter(Boolean).map((item) => (
+              <Link key={item.label} href={item.href}>
                 <div className="bg-white border border-border rounded-2xl p-5 hover-lift cursor-pointer">
                   <div className={`inline-flex px-3 py-1 rounded-lg text-xs font-semibold mb-3 ${item.color}`}>
                     Quick Access
