@@ -78,7 +78,6 @@ export default function AllBloodDonationRequest({ status, page, limit }) {
     try {
       const res = await getAllRequests(status, page, limit);
       setRequests(res.requests || []);
-      console.log(res);
       setTotalPages(Math.ceil(Number(res.total) / Number(limit)) || 1);
     } catch (error) {
       console.error("Failed to load requests:", error);

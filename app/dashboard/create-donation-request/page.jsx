@@ -82,7 +82,6 @@ export default function CreateDonationRequestPage() {
         status: "pending",
       };
       const res = await postDonationRequest(request);
-      console.log(res)
       if (res.status == 200 || res.status == 201) {
         toast.success(res.message);
         setSuccess(true);

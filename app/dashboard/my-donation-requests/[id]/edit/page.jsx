@@ -65,7 +65,6 @@ export default function EditDonationRequestPage() {
             const { request, status } = await getRequestById(id);
             if (status == 200) {
                 const req = request
-                console.log(req)
                 setForm({
                     requesterName: req.requesterName || "",
                     requesterEmail: req.requesterEmail || "",
