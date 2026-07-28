@@ -11,21 +11,22 @@ import { fundingAPI } from "@/lib/api";
 import { getUser } from "@/lib/api/user/user";
 import { useRouter } from "next/navigation";
 import { getTotalFunding } from "@/lib/api/server/action";
+import { serverFetch } from "@/lib/api/core/core";
 
 function FundRow({ fund, index }) {
   return (
     <tr className="hover:bg-cream/40 transition-colors">
       <td className="px-5 py-4 text-sm text-ash font-mono">{String(index + 1).padStart(2, "0")}</td>
       <td className="px-5 py-4">
-        <p className="font-medium text-charcoal text-sm">{fund.donorName}</p>
+        <p className="font-medium text-charcoal text-sm">{fund.name || "Anonymous"}</p>
       </td>
       <td className="px-5 py-4">
         <span className="font-mono font-bold text-wine text-base">
-          ৳{fund.amount.toLocaleString()}
+          ৳{Number(fund.amount || 0).toLocaleString()}
         </span>
       </td>
       <td className="px-5 py-4 text-xs text-ash">{fund.date}</td>
-      <td className="px-5 py-4 text-xs text-ash font-mono">{fund.transactionId}</td>
+      <td className="px-5 py-4 text-xs text-ash font-mono">TXN-{String(index + 1).padStart(2, "0")}</td>
     </tr>
   );
 }
@@ -55,10 +56,10 @@ export default function FundingPage() {
         const funding = await getTotalFunding();
         setTotal(funding.funding);
 
-        fundingAPI.getAll().then(({ funds }) => {
-          setFunds(funds);
-          setLoading(false);
-        });
+        const { funders } = await serverFetch('/all-funders');
+        setFunds(funders);
+        setLoading(false);
+
 
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -118,7 +119,7 @@ export default function FundingPage() {
                 <div className="bg-wine rounded-2xl p-6 text-ivory max-w-xs w-full">
                   <p className="text-ivory/60 text-sm font-mono">Total Raised</p>
                   <p className="font-mono font-bold text-4xl mt-1">
-                    ৳ {total}K
+                    ৳ {total}
                   </p>
                   <p className="text-ivory/50 text-xs mt-2">{funds.length} contributors</p>
                   <Button
@@ -158,6 +159,10 @@ export default function FundingPage() {
               <div className="p-8 space-y-3">
                 {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-12 rounded-xl bg-cream animate-pulse" />)}
               </div>
+            ) : !funds || funds.length === 0 ? (
+              <div className="p-12 text-center text-ash text-sm">
+                No contributions found yet. Be the first to give fund!
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -172,7 +177,7 @@ export default function FundingPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {funds.map((f, i) => <FundRow key={f._id} fund={f} index={i} />)}
+                    {funds.map((f, i) => <FundRow key={f._id || i} fund={f} index={i} />)}
                   </tbody>
                 </table>
               </div>
