@@ -8,6 +8,8 @@ import { BLOOD_GROUPS, DISTRICTS, UPAZILAS } from "@/lib/mockData";
 import { CustomSelect } from "@/components/CustomSelect";
 import toast from "react-hot-toast";
 import { getAllDonors } from "@/lib/api/user/user";
+import { pdf } from "@react-pdf/renderer";
+import DonorPDF from "@/components/DonorReport";
 
 const BG = {
   "A+": "bg-red-50 text-red-700", "B+": "bg-orange-50 text-orange-700",
@@ -42,10 +44,10 @@ function DonorCard({ donor }) {
         <span className="text-charcoal font-medium">{donor.lastDonated}</span>
       </div>
 
-        <Button size="sm"
-          className="bg-wine text-white font-semibold rounded-xl hover:bg-wine-dark transition-colors">
-          Contact Donor
-        </Button>
+      <Button size="sm"
+        className="bg-wine text-white font-semibold rounded-xl hover:bg-wine-dark transition-colors">
+        Contact Donor
+      </Button>
     </div>
   );
 }
@@ -110,8 +112,33 @@ function SearchContent() {
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const downloadPDF = () => {
-    window.print();
+  const downloadPDF = async () => {
+    if (results.length === 0) {
+      toast.error("No results to download");
+      return;
+    }
+
+    const toastId = toast.loading("Generating PDF…");
+    try {
+      const blob = await pdf(
+        <DonorPDF donors={results} filters={form} />
+      ).toBlob();
+
+      // Create a temporary <a> and trigger download
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `vitae-donors-${Date.now()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("PDF downloaded!", { id: toastId });
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      toast.error("Failed to generate PDF", { id: toastId });
+    }
   };
 
   return (
