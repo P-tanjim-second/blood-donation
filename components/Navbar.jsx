@@ -131,22 +131,22 @@ export default function Navbar() {
                     </button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label="User actions" className="min-w-[180px]">
-                    <DropdownItem key="dashboard" textValue="Dashboard">
-                      <Link href="/dashboard" className="block w-full">
+                    <DropdownItem key="dashboard" textValue="Dashboard" href="/dashboard">
+                      <button className="block fit-content">
                         Dashboard
-                      </Link>
+                      </button>
                     </DropdownItem>
-                    <DropdownItem key="profile" textValue="Profile">
-                      <Link href="/dashboard/profile" className="block w-full">
+                    <DropdownItem key="profile" textValue="Profile" href="/dashboard/profile">
+                      <button className="block fit-content">
                         Profile
-                      </Link>
+                      </button>
                     </DropdownItem>
 
                     <DropdownItem key="logout" color="danger" className="text-danger"
-                      textValue="Logout">
-                      <Link href="/login" onClick={handleSignOut} className="block w-full">
+                      textValue="Logout" href="/login" onClick={handleSignOut} >
+                      <button className="block fit-content">
                         Log out
-                      </Link>
+                      </button>
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>

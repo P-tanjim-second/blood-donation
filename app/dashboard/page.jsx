@@ -142,7 +142,7 @@ export default function DashboardPage() {
       {(isAdmin || isVolunteer) && (
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard icon={ICON_USER} label="Total Donors" value={totalDonors.toLocaleString()} sub="Registered users" color="wine" />
-          <StatCard icon={ICON_MONEY} label="Total Funding" value={`৳${totalFunding}K`} sub="Community raised" color="amber" />
+          <StatCard icon={ICON_MONEY} label="Total Funding" value={`৳${totalFunding}`} sub="Community raised" color="amber" />
           <StatCard icon={ICON_DROP} label="Blood Requests" value={totalRequests.toLocaleString()} sub="All time" color="blue" />
         </div>
       )}
