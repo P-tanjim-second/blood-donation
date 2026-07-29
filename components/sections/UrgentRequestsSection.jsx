@@ -97,7 +97,7 @@ export default function UrgentRequestsSection() {
 
   useEffect(() => {
     const func = async () => {
-      const requests = await getPendingRequests("pending", 1, 3);
+      const requests = await getPendingRequests(1, 3);
       setRequests(requests.requests);
       setLoading(false);
     }
