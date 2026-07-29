@@ -247,10 +247,20 @@ export default function AllUsers({ currentStatusFilter, currentPage }) {
                                   </DropdownItem>
                                 )}
                                 {u.userRole !== "admin" && (
-                                  <DropdownItem key="admin" color="warning"
-                                    onPress={() => handleRoleChange(u._id, "admin", u.name)}>
-                                    Make Admin
-                                  </DropdownItem>
+                                  <>
+                                    {
+                                      u.userRole !== "donor" && (
+                                        <DropdownItem key="donor" color="primary"
+                                          onPress={() => handleRoleChange(u._id, "donor", u.name)}>
+                                          Make donor
+                                        </DropdownItem>
+                                      )
+                                    }
+                                    <DropdownItem key="admin" color="warning"
+                                      onPress={() => handleRoleChange(u._id, "admin", u.name)}>
+                                      Make Admin
+                                    </DropdownItem>
+                                  </>
                                 )}
                               </DropdownMenu>
                             </Dropdown>
