@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button, Chip } from "@heroui/react";
-import { getAllRequests } from "@/lib/api/server/action";
+import { getPendingRequests } from "@/lib/api/server/action";
 
 
 
@@ -97,7 +97,7 @@ export default function UrgentRequestsSection() {
 
   useEffect(() => {
     const func = async () => {
-      const requests = await getAllRequests("pending", 1, 3);
+      const requests = await getPendingRequests("pending", 1, 3);
       setRequests(requests.requests);
       setLoading(false);
     }
