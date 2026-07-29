@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button, Pagination } from "@heroui/react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getAllRequests } from "@/lib/api/server/action";
+import { getPendingRequests } from "@/lib/api/server/action";
 
 const BG_COLORS = {
   "A+": "bg-red-50   text-red-700   border-red-200",
@@ -112,7 +112,7 @@ export default function DonationRequestsPage() {
     async function getRequests() {
       setLoading(true);
       try {
-        const response = await getAllRequests("pending", currentPage, itemsPerPage);
+        const response = await getPendingRequests(currentPage, itemsPerPage);
 
         setRequests(response.requests || []);
         setTotalPages(Math.ceil(response.total / itemsPerPage));
