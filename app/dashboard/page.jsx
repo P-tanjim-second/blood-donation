@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { getAllDonors, getAllUsers, getUser } from "@/lib/api/user/user";
 import TableSkeleton from "@/components/TableSkeleton";
 import { getAllRequests, getMyDonationRequests, getTotalFunding } from "@/lib/api/server/action";
+import DonationChart from "@/components/DonationChart";
 
 const STATUS_CHIP = {
   pending: { color: "warning", label: "Pending" },
@@ -146,6 +147,8 @@ export default function DashboardPage() {
           <StatCard icon={ICON_DROP} label="Blood Requests" value={totalRequests.toLocaleString()} sub="All time" color="blue" />
         </div>
       )}
+
+      {isAdmin && <DonationChart />}
 
       {/* Recent requests (donor view) */}
       {!isAdmin && !isVolunteer && (
